@@ -1,0 +1,181 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Experience | ${SITE_TITLE}`} />
+  </head>
+<body>
+  <Header />
+  <main>
+    <section style="max-width: 900px; margin: 2rem auto;">
+      <h1 style="font-size:2.2rem; margin-bottom:1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;">Work Experience</h1>
+
+      <!-- Senior Software Engineer | EROAD, Auckland -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Senior Software Engineer</span>
+            <span style="color:#888; font-size:1rem;"> @ EROAD, Auckland</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Aug 2023 – Present</time>
+        </header>
+        <ul style="margin-top:0.7em;">
+          <li>Architected and maintained event-driven customer integrations using Kafka and ServiceBus, enabling seamless external system connectivity and improving data flow efficiency for business-critical operations.</li>
+          <li>Optimized CI/CD pipelines, reducing deployment failures and increasing automation coverage, ensuring consistent and reliable release processes.</li>
+          <li>Improved developer experience by enforcing Clean Code, SOLID principles, and best practices across engineering workflows.</li>
+          <li>Designed scalable microservices-based architecture using Clean Architecture, DDD, and Kubernetes, ensuring performance, scalability, and fault tolerance.</li>
+          <li>Enhanced system monitoring using Datadog, implementing real-time dashboards and alerts mechanisms for proactive issue identification.</li>
+          <li>Led adoption of feature flags via Azure App Configuration, enabling safer incremental releases and reducing deployment risks.</li>
+          <li>Automated infrastructure management by migrating manual resources (“click-ops”) to Terraform, reducing operational overhead and improving deployment reliability.</li>
+          <li>Conducted architecture reviews, driving strategic technical decisions that improved system scalability, maintainability, and alignment with organizational goals.</li>
+          <li>Collaborated across engineering and business teams to ensure solutions aligned with customer needs and organizational objectives.</li>
+          <li>Assisted in hiring and interview processes, mentoring candidates and ensuring skill alignment with organizational requirements.</li>
+        </ul>
+        <details style="margin-top:0.5em;">
+          <summary style="cursor:pointer; font-weight:500; color:#2a6ebb;">Key Projects</summary>
+          <ul>
+            <li><b>Sysco Integration:</b> Architected solution using .NET 6, Kubernetes, ServiceBus, GitHub Actions, Kafka, MongoDB, and Datadog to streamline internal and external integrations.</li>
+            <li><b>Customer Integrations:</b> Delivered business-driven systems using .NET Core 3.1, Kubernetes, Azure DevOps, ServiceBus, MongoDB, and MediatR to enable reliable customer connectivity.</li>
+            <li><b>Legacy Pipeline Modernization:</b> Refactored legacy systems with .NET, Bitbucket, Azure Functions, and Azure DevOps, enhancing system reliability and compliance efforts.</li>
+          </ul>
+        </details>
+      </article>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+      <!-- Lead Software Engineer | First Rescue, Auckland -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Lead Software Engineer</span>
+            <span style="color:#888; font-size:1rem;"> @ First Rescue, Auckland</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Jul 2019 – Aug 2023</time>
+        </header>
+        <ul style="margin-top:0.7em;">
+          <li>Led development of scalable .NET Core & Angular applications, modernizing legacy systems to improve performance and reduce technical debt.</li>
+          <li>Migrated legacy SQL databases to Azure, ensuring compliance with audit requirements and improving data security and accessibility.</li>
+          <li>Rewrote and optimized incident & policy management systems, enhancing system responsiveness and scalability to meet growing business demands.</li>
+          <li>Maintained and improved a Xamarin-based mobile application, increasing application stability and delivering a better user experience.</li>
+          <li>Integrated ServiceNow, Auto Integrity, and Linksoft, streamlining business workflows and enabling seamless communication across platforms.</li>
+          <li>Developed and optimized CI/CD pipelines in Azure DevOps, reducing deployment time and increasing pipeline success rates through automation.</li>
+          <li>Managed Azure cloud resources, achieving an optimal balance between resource cost and system performance.</li>
+        </ul>
+        <details style="margin-top:0.5em;">
+          <summary style="cursor:pointer; font-weight:500; color:#2a6ebb;">Key Projects</summary>
+          <ul>
+            <li><b>Incident Management Systems:</b> Designed scalable systems using .NET Core, Angular, and Azure DevOps, modernizing legacy workflows and boosting reliability.</li>
+            <li><b>Policy Management Systems:</b> Led development efforts with .NET Core, Angular, and MSSQL, improving scalability and maintaining compliance with regulatory standards.</li>
+            <li><b>ServiceNow Integration:</b> Delivered mission-critical integrations using .NET 5, Service Bus, and REST APIs, enabling real-time synchronization across systems.</li>
+            <li><b>Mobile API for Flutter App:</b> Developed APIs using .NET 6 and optimized deployment pipelines using Azure DevOps, supporting seamless mobile integration.</li>
+            <li><b>Policy Decryption Automation:</b> Implemented automation solutions using .NET 7, Azure Functions, and Azure Storage, reducing manual intervention and improving data accuracy.</li>
+          </ul>
+        </details>
+      </article>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+      <!-- Contract Software Engineer | EQALIS (Remote) -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Contract Software Engineer</span>
+            <span style="color:#888; font-size:1rem;"> @ EQALIS (Remote)</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Dec 2019 – Jul 2021</time>
+        </header>
+        <ul style="margin-top:0.7em;">
+          <li>Designed modular web applications using Node.js, Express, and Vue.js, enhancing system scalability and reducing technical complexity.</li>
+          <li>Integrated external APIs, including MYOB, to expand system connectivity, streamline business workflows, and improve operational efficiency.</li>
+          <li>Improved code quality and team productivity by implementing strict gatekeeping principles and enforcing best practices, reducing code review errors.</li>
+          <li>Developed hardware simulation solutions with Arduino, C#, and .NET, enabling comprehensive testing and validation of device functionality without requiring physical hardware.</li>
+          <li>Collaborated with cross-functional teams to ensure smooth delivery of proprietary server solutions, utilizing Node.js, Express, WebSockets, and TypeORM.</li>
+        </ul>
+        <details style="margin-top:0.5em;">
+          <summary style="cursor:pointer; font-weight:500; color:#2a6ebb;">Key Projects</summary>
+          <ul>
+            <li><b>MYOB Integration:</b> Delivered seamless integrations using Express, TypeScript, and Node.js, improving system capabilities and supporting end-to-end workflows.</li>
+            <li><b>Hardware Simulation:</b> Designed simulation tools using C#, and .NET, enabling thorough testing of hardware interactions and validating system logic without physical components.</li>
+            <li><b>EQALIS Server:</b> Developed a high-performance server-side solution using Node.js, Express, WebSockets, and TypeORM, facilitating real-time communication between distributed systems.</li>
+          </ul>
+        </details>
+      </article>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+      <!-- Full Stack Developer | HS One, Auckland -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Full Stack Developer</span>
+            <span style="color:#888; font-size:1rem;"> @ HS One, Auckland</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Feb 2018 – Jul 2019</time>
+        </header>
+        <ul style="margin-top:0.7em;">
+          <li>Designed containerized APIs using .NET Core and Kubernetes, ensuring scalability, high availability, and modularity for distributed systems.</li>
+          <li>Created and optimized front-end applications with Angular and TypeScript, streamlining workflows and enhancing user experience in customer-facing systems.</li>
+          <li>Developed service simulators using .NET Framework, enabling robust testing environments and minimizing reliance on third-party service availability.</li>
+          <li>Worked collaboratively with cross-functional teams to deliver systems aligned with business objectives, ensuring consistency and quality across microservices architecture.</li>
+        </ul>
+        <details style="margin-top:0.5em;">
+          <summary style="cursor:pointer; font-weight:500; color:#2a6ebb;">Key Projects</summary>
+          <ul>
+            <li><b>Prior Approvals:</b> (.NET Core 3.1, Kubernetes, Angular)</li>
+            <li><b>Orthodontics:</b> (.NET Core 3.1, Kubernetes, Angular)</li>
+            <li><b>Background Services:</b> (.NET Core 3.1, Kubernetes)</li>
+          </ul>
+        </details>
+      </article>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+      <!-- Full Stack Developer | Private Flight Global, Auckland -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Full Stack Developer</span>
+            <span style="color:#888; font-size:1rem;"> @ Private Flight Global, Auckland</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Dec 2016 – Feb 2018</time>
+        </header>
+        <ul style="margin-top:0.7em;">
+          <li>Designed and implemented a PDF generation module, automating report workflows and reducing manual processing efforts.</li>
+          <li>Implemented the repository pattern with EF Core, improving data handling efficiency, scalability, and maintainability.</li>
+          <li>Enhanced search functionality, enabling faster data retrieval and significantly improving system usability for internal and client-facing applications.</li>
+          <li>Automated various scripted functions, reducing manual intervention and boosting productivity across critical processes.</li>
+          <li>Collaborated with stakeholders to identify system inefficiencies and deliver innovative, user-friendly solutions aligned with business objectives.</li>
+        </ul>
+        <details style="margin-top:0.5em;">
+          <summary style="cursor:pointer; font-weight:500; color:#2a6ebb;">Key Projects</summary>
+          <ul>
+            <li><b>Flight Management Platform:</b> Developed a modular architecture using .NET Core 2.1, .NET Framework 4.5, and Angular 2, enabling scalability for managing flight operations and improving data flow.</li>
+            <li><b>Platform Migration Tool:</b> Built a data migration tool using .NET Core 2.1, streamlining legacy system upgrades and ensuring seamless data integrity during transitions.</li>
+          </ul>
+        </details>
+      </article>
+
+      <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+      <!-- Software Engineer (Internships) -->
+      <article style="margin-bottom:2.5rem;">
+        <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+          <div>
+            <span style="font-size:1.2rem; font-weight:600;">Software Engineer (Internships)</span>
+            <span style="color:#888; font-size:1rem;"> @ Nazar Software, Istanbul & TUBITAK, Istanbul</span>
+          </div>
+          <time style="color:#666; font-size:0.95rem;">Jun 2014 – Aug 2014, Jun 2012 – Aug 2012</time>
+        </header>
+      </article>
+
+    </section>
+  </main>
+  <Footer />
+</body>
+</html>
