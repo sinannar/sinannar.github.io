@@ -2,10 +2,10 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main] # or 'master' depending on your default branch
+    branches: [main] 
 
 permissions:
-  contents: write  # ✅ Needed to push to gh-pages
+  contents: write 
 
 jobs:
   deploy:
@@ -31,3 +31,4 @@ jobs:
         uses: withastro/action@v2
         with:
           deploy-dir: dist
+          branch: gh-pages
