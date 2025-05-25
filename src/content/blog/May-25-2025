@@ -1,0 +1,23 @@
+---
+title: 'Copilot Exam'
+description: 'Github Copilot Certifications'
+pubDate: 'May 25 2025'
+heroImage: '/kubernetes-aspire.png'
+---
+
+# GitHub Copilot Exam Prep Guide
+
+This document is intended to help you prepare for exams or assessments that evaluate your ability to use **GitHub Copilot** effectively in a coding environment.
+
+---
+
+## ✅ Overview of GitHub Copilot
+
+- **What is Copilot?**  
+  GitHub Copilot is an AI-powered code completion tool developed by GitHub and OpenAI. It helps developers by suggesting code snippets and entire functions in real-time.
+
+- **Supported Languages:**  
+  Python, JavaScript/TypeScript, C#, Java, Go, Ruby, PHP, HTML/CSS, and more.
+
+- **Integrated Environments:**  
+  Visual Studio Code, Neovim, JetBrains IDEs, Visual Studio.
