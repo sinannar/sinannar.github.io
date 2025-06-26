@@ -145,6 +145,8 @@ Lets say you create a project from scratch, or clone a project from version cont
 
 ## Creating a Solution with Projects
 You probably would use `-n` and/or `-o` with dotnet new. Lets go a journey together about setting an API project with Application, Domain, Infrastructure, Persistance layers with a solution file. For this lets create a new TestProject folder and start putting things inside
+
+```md
 1. `mkdir TestProject` to create TestProject folder and `cd TestProject` to get into it
 2. `dotnet new sln -f slnx -n testproject` will create `testproject.slnx` solution file
 3. We are going to run the following commands to create needed projects
@@ -168,13 +170,16 @@ You probably would use `-n` and/or `-o` with dotnet new. Lets go a journey toget
     - AutoMapper to Infrastructure `dotnet add testproject.infrastructure/testproject.infrastructure.csproj package AutoMapper`
     - EntityFramework to Persistance `dotnet add testproject.persistance/testproject.persistance.csproj package Microsoft.EntityFrameworkCore`
     - MediatR to Application `dotnet add testproject.application/testproject.application.csproj package MediatR`
+```
 
 If we go over what we have done, we create a folder and get into it at `1`. Created a solution file at `2`. We created a webapi at the 1th point of `3` and created supporting layers as class library at other points. At `4`, we added all projects to solution so we can have solution view. At this point, if you open the `TestProject` folder with `vs code` and if you have `C# Dev Kit` extension installed, you can view it as `solution`. We created a logical references in a structured way at `5` and installed some nuget dependencies at `6`.
 
 ## Bonus Commands
+```md
 - `dotnet new globaljson` to set dotnet version for folder
 - `dotnet new gitignore` to create gitignore file for the repo
 - `dotnet new editorconfig` to create editor config file
 - `dotnet tool` to work with tools that extends .Net Experience
 - `dotnet dev-certs` to manage developer certificates
 - `dotnet watch run` to run application with restart with changes
+```

@@ -153,3 +153,28 @@ hr {
 	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
+
+.prose pre {
+	width: 160%;
+	max-width: 160%;
+	transform: translateX(-20%);
+}
+
+
+table {
+	border: #000d8a solid;
+	border-radius: 20px;
+	border-width: 3px;
+	padding: 10px;
+	margin: 10px;
+}
+
+img {
+	width: 250px;
+	height: auto;
+}
+
+li img {
+	width: 250px;
+	height: auto;
+}
