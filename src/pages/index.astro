@@ -1,54 +1,102 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<script type="text/javascript">
+			(function (c, l, a, r, i, t, y) {
+				c[a] =
+					c[a] ||
+					function () {
+						(c[a].q = c[a].q || []).push(arguments);
+					};
+				t = l.createElement(r);
+				t.async = 1;
+				t.src = "https://www.clarity.ms/tag/" + i;
+				y = l.getElementsByTagName(r)[0];
+				y.parentNode.insertBefore(t, y);
+			})(window, document, "clarity", "script", "s5jfnsazxg");
+		</script>
 	</head>
 	<body>
 		<Header />
-<main>
-  <section style="margin-bottom: 2rem;">
-  <h1 style="font-size:2.5rem; margin-bottom:0.5rem;">Sinan Nar</h1>
-  <h2 style="font-size:1.5rem; color: #666; margin-bottom:1.5rem;">Senior Software Engineer & Technical Leader</h2>
-  <p style="max-width: 700px;">
-	Passionate Software Engineer and Technical Leader with extensive experience in designing and maintaining scalable, cloud-native applications. Specialized in .NET, Kubernetes, and DevOps, with a strong focus on event-driven architectures, clean architecture, and system performance optimization.<br><br>
-	I thrive on solving complex technical challenges, mentoring teams, and driving innovation through automation, CI/CD pipeline optimization, and enhancing developer workflows. With a proven track record of delivering customer-centric solutions, I create systems that are robust, scalable, and future-proof.<br><br>
-	I actively participate in tech meetups, certification exams, and mentorship programs to contribute to the growth of the software engineering community. Outside of work, I enjoy cycling around Auckland and staying updated with emerging technologies.
-  </p>
-  <!-- Social/contact links moved to Header and Footer -->
-	<hr style="margin:2rem 0;">
-<div style="display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem;">
-  <div style="flex: 1 1 250px; min-width: 220px;">
-	<h3>What I Work With</h3>
-	<p style="margin: 0 0 0.5em 0;">.NET (Core & 6+), C#, JavaScript, TypeScript, Angular, Ionic, Node.js</p>
-	<p style="margin: 0 0 0.5em 0;">Kubernetes, Docker, Azure (App Services, Functions, Service Bus, AKS, Container Apps, KeyVault)</p>
-	<p style="margin: 0 0 0.5em 0;">CI/CD (GitHub Actions, Azure DevOps), Terraform, Integration Testing, TDD, BDD</p>
-	<p style="margin: 0 0 0.5em 0;">SQL (MSSQL, PostgreSQL, MySQL), MongoDB, CosmosDB, Datadog, Azure Monitor</p>
-  </div>
-  <div style="flex: 1 1 250px; min-width: 220px;">
-	<h3>How I Work</h3>
-	<ul style="margin: 0; padding-left: 1.2em;">
-	  <li>Clear, friendly communication with all stakeholders</li>
-	  <li>Collaborative and supportive team player</li>
-	  <li>Mentor and coach for junior developers</li>
-	  <li>Proactive problem solver and decision maker</li>
-	  <li>Strong time management and prioritization</li>
-	  <li>Always learning and sharing knowledge</li>
-	</ul>
-  </div>
-</div>
-
-
-  </section>
-  <section>
-	<a href="/blog" style="font-size:1.2rem;">Read my Blog &rarr;</a>
-  </section>
+		<main>
+			<section style="margin-bottom: 2rem;">
+				<h1 style="font-size:2.5rem; margin-bottom:0.5rem;">
+					Sinan Nar
+				</h1>
+				<h2
+					style="font-size:1.5rem; color: #666; margin-bottom:1.5rem;"
+				>
+					Senior Software Engineer & Technical Leader
+				</h2>
+				<p style="max-width: 700px;">
+					Passionate Software Engineer and Technical Leader with
+					extensive experience in designing and maintaining scalable,
+					cloud-native applications. Specialized in .NET, Kubernetes,
+					and DevOps, with a strong focus on event-driven
+					architectures, clean architecture, and system performance
+					optimization.<br /><br />
+					I thrive on solving complex technical challenges, mentoring teams,
+					and driving innovation through automation, CI/CD pipeline optimization,
+					and enhancing developer workflows. With a proven track record
+					of delivering customer-centric solutions, I create systems that
+					are robust, scalable, and future-proof.<br /><br />
+					I actively participate in tech meetups, certification exams,
+					and mentorship programs to contribute to the growth of the software
+					engineering community. Outside of work, I enjoy cycling around
+					Auckland and staying updated with emerging technologies.
+				</p>
+				<!-- Social/contact links moved to Header and Footer -->
+				<hr style="margin:2rem 0;" />
+				<div
+					style="display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem;"
+				>
+					<div style="flex: 1 1 250px; min-width: 220px;">
+						<h3>What I Work With</h3>
+						<p style="margin: 0 0 0.5em 0;">
+							.NET (Core & 6+), C#, JavaScript, TypeScript,
+							Angular, Ionic, Node.js
+						</p>
+						<p style="margin: 0 0 0.5em 0;">
+							Kubernetes, Docker, Azure (App Services, Functions,
+							Service Bus, AKS, Container Apps, KeyVault)
+						</p>
+						<p style="margin: 0 0 0.5em 0;">
+							CI/CD (GitHub Actions, Azure DevOps), Terraform,
+							Integration Testing, TDD, BDD
+						</p>
+						<p style="margin: 0 0 0.5em 0;">
+							SQL (MSSQL, PostgreSQL, MySQL), MongoDB, CosmosDB,
+							Datadog, Azure Monitor
+						</p>
+					</div>
+					<div style="flex: 1 1 250px; min-width: 220px;">
+						<h3>How I Work</h3>
+						<ul style="margin: 0; padding-left: 1.2em;">
+							<li>
+								Clear, friendly communication with all
+								stakeholders
+							</li>
+							<li>Collaborative and supportive team player</li>
+							<li>Mentor and coach for junior developers</li>
+							<li>Proactive problem solver and decision maker</li>
+							<li>Strong time management and prioritization</li>
+							<li>Always learning and sharing knowledge</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+			<section>
+				<a href="/blog" style="font-size:1.2rem;">Read my Blog &rarr;</a
+				>
+			</section>
 		</main>
 		<Footer />
 	</body>
