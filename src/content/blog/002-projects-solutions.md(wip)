@@ -1,9 +1,62 @@
 ---
-title: 'Projects & Solution (WiP)'
-description: 'Working w Projects (WiP)'
-pubDate: 'Jan 2 1002'
-# pubDate: 'Jun 27 2025'
+title: 'Projects & Solution'
+description: 'Working w Projects'
+pubDate: 'July 1 2025'
 heroImage: '/002-projects-solutions.png'
 ---
 
-This item is in Work in Progress and not yet published
+# Projects 
+
+Today, we are going to talk about how we can setup projects in a solution. Everyone has their opinion, and believe me when I say this, if you have some consistency, you can live with it. 
+
+## Content
+1. [One project to Rule them all](#rule-them-all)
+2. [Breaking it up](#divide-and-conquer)
+3. [Introducing Clean Architecture](#clean-architecture)
+
+# Rule them All
+You go and create a single project with dotnet cli, probably just running `dotnet new webapi -n MyFirstApp` and you put everything in it. This is good for quick Proof of Concept (PoC) experiments, prototyping. It is neither testable nor modular.
+
+## Ability to Test
+
+## Modularity of Project Structure
+Modularity bring seperation of concern (SoC) which makes the system easir to reason about, debug and modify. When you have modularity, you automatically improve testability because you can mock dependencies, isolate and test edge cases efficiently. 
+
+
+
+
+# Divide and Conquer
+
+
+# Clean Architecture
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+# 📊 Comparison of C#/.NET Project Structures
+
+| Structure Name             | Ideal For                                | Complexity | Scalable? | Testing-Friendly | Typical Projects or Layout                          |
+|---------------------------|------------------------------------------|------------|-----------|------------------|-----------------------------------------------------|
+| **Single-Project (Monolith)** | Tiny apps, quick demos                     | ⭐          | ❌ No     | 🚫 Limited       | `MyApp.csproj` (everything in one)                  |
+| **Basic Multi-Project**   | Small/medium apps, learning architecture | ⭐⭐         | ⚠️ Somewhat | ✅ Yes           | `API`, `Core`, `Data`, `Worker`, `Tests`           |
+| **Clean Architecture**    | Enterprise apps, domain-driven design    | ⭐⭐⭐⭐       | ✅ Yes     | ✅✅ High         | `Domain`, `Application`, `Infrastructure`, `API`, `Tests`, `CrossCutting` |
+| **Onion Architecture**    | Business-rule-focused layered apps       | ⭐⭐⭐⭐       | ✅ Yes     | ✅✅ High         | Similar to Clean: `Core`, `App`, `Infra`, `UI`     |
+| **Hexagonal (Ports & Adapters)** | Highly decoupled I/O-bound systems        | ⭐⭐⭐⭐⭐     | ✅ Yes     | ✅✅ High         | `Core`, `Adapters` (Web, DB, Queue, etc.)           |
+| **Modular Monolith**      | Apps needing internal module separation  | ⭐⭐⭐⭐       | ✅ Yes     | ✅ Yes           | `Modules/Product`, `Modules/User`, `API`, `Core`   |
+| **Plugin-Based**          | Extensible apps, multi-tenant platforms  | ⭐⭐⭐⭐       | ✅ Yes     | ⚠️ Depends       | `Core`, `Plugins`, `Shared`, `Loaders`              |
+| **Microservices**         | Large teams, distributed systems         | ⭐⭐⭐⭐⭐⭐     | ✅✅ Very   | ✅✅ High         | Multiple APIs with separate DBs and internal layers |
+| **Folder-Based (1-Project)** | Small apps wanting structure             | ⭐          | ❌ No     | ⚠️ Moderate       | Folders: `Controllers/`, `Services/`, `Models/`     |
+ -->
