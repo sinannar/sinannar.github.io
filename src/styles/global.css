@@ -55,24 +55,27 @@ h3,
 h4,
 h5,
 h6 {
-	margin: 0 0 0.5rem 0;
+	margin: 0 0 0 0;
 	color: rgb(var(--black));
 	line-height: 1.2;
 }
 h1 {
-	font-size: 3.052em;
+	font-size: 2.5em;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: 2em;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: 1.6em;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: 1.4em;
 }
 h5 {
-	font-size: 1.25em;
+	font-size: 1.1em;
+}
+h6 {
+	font-size: 0.8em;
 }
 strong,
 b {
@@ -165,8 +168,14 @@ table {
 	border: #000d8a solid;
 	border-radius: 20px;
 	border-width: 3px;
-	padding: 10px;
-	margin: 10px;
+	padding: 30px;
+
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+
+	width: 160%;
+	max-width: 160%;
+	transform: translateX(-20%);
 }
 
 .hero-image img {
@@ -177,4 +186,18 @@ table {
 li img {
 	width: 250px;
 	height: auto;
+}
+
+hr {
+	width: 160%;
+	max-width: 160%;
+	transform: translateX(-20%);
+
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+
+	border: none;      /* remove default border */
+	height: 4px;       /* thickness */
+	background-color: #333; /* color of the line */
+	margin: 2rem auto; /* vertical spacing + center */
 }
