@@ -1,9 +1,194 @@
 ---
 title: 'Dependency Injection (WiP)'
 description: 'Not calling constructors (WiP)'
-pubDate: 'Jan 3 1003'
-# pubDate: 'July 5 2025'
-heroImage: '/003-dependency-injection.png'
+pubDate: 'July 15 2025'
+heroImage: '/004-dependency-injection.png'
 ---
 
-This item is in Work in Progress and not yet published
+## 🧭 Introduction
+
+Dependency Injection (DI) is a cornerstone of modern .NET development. It improves testability, promotes loose coupling, and helps build scalable applications. Whether you're building ASP.NET Core APIs, Blazor apps, or even console tools, DI will be part of your journey.
+
+> _"If you've written a constructor with `new SomeService()` inside it—you're doing it the hard way. Dependency Injection makes that unnecessary."_
+
+---
+
+## ⚙️ What is Dependency Injection?
+
+Dependency Injection is a design pattern that deals with how components get their dependencies. Instead of instantiating dependencies directly inside a class, we ask for them via constructor or other methods.
+
+DI is one form of **Inversion of Control (IoC)**—reversing the responsibility of creating objects.
+
+### Tight Coupling Example
+
+```csharp
+public class OrderProcessor {
+    private readonly EmailService _emailService = new EmailService(); // tightly coupled
+}
+```
+
+### With Dependency Injection
+
+```csharp
+public class OrderProcessor {
+    private readonly IEmailService _emailService;
+    public OrderProcessor(IEmailService emailService) {
+        _emailService = emailService;
+    }
+}
+```
+
+---
+
+## 🛠 Built-in Dependency Injection in .NET Core
+
+.NET Core has a built-in IoC container (Microsoft.Extensions.DependencyInjection). It’s lightweight and supports most use cases.
+
+### Registering Services
+
+In `Program.cs` or `Startup.cs`:
+
+```csharp
+builder.Services.AddTransient<IEmailService, EmailService>();
+```
+
+### Service Lifetimes
+
+| Lifetime   | Description                              |
+|------------|------------------------------------------|
+| Transient  | New instance every time                  |
+| Scoped     | Once per request (e.g., HTTP request)    |
+| Singleton  | Shared for the app lifetime              |
+
+---
+
+## 🧪 Constructor Injection (Most Common)
+
+Constructor injection is the most widely used form of DI.
+
+```csharp
+public class HomeController : Controller {
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(ILogger<HomeController> logger) {
+        _logger = logger;
+    }
+}
+```
+
+---
+
+## 🔄 Other Types of Injection
+
+### Property Injection
+
+Useful for optional dependencies.
+
+```csharp
+public class MyService {
+    [Inject]
+    public ILogger<MyService> Logger { get; set; }
+}
+```
+
+### Method Injection
+
+Used in middlewares or when resolving services manually.
+
+```csharp
+public void Configure(IApplicationBuilder app) {
+    var myService = app.ApplicationServices.GetService<IMyService>();
+}
+```
+
+---
+
+## 📦 Registering Services in the DI Container
+
+Register services using one of:
+
+```csharp
+services.AddSingleton<IMyService, MyService>();
+services.AddScoped<IMyService, MyService>();
+services.AddTransient<IMyService, MyService>();
+```
+
+### Auto-registration or Assembly Scanning?
+
+While .NET DI is manual by default, you can use reflection or libraries like Scrutor for auto-registration.
+
+---
+
+## 🧰 Real World Example: Email Service
+
+```csharp
+// Interface
+public interface IEmailService {
+    void SendEmail(string to, string subject, string body);
+}
+
+// Implementation
+public class EmailService : IEmailService {
+    public void SendEmail(string to, string subject, string body) {
+        // Logic here
+    }
+}
+
+// Registration
+services.AddScoped<IEmailService, EmailService>();
+
+// Injection
+public class NotificationController {
+    private readonly IEmailService _emailService;
+
+    public NotificationController(IEmailService emailService) {
+        _emailService = emailService;
+    }
+}
+```
+
+---
+
+## 🧪 Unit Testing with Dependency Injection
+
+Constructor injection makes unit testing easy with mocks.
+
+```csharp
+var mockEmailService = new Mock<IEmailService>();
+var controller = new NotificationController(mockEmailService.Object);
+```
+
+You can also use libraries like **Moq**, **FakeItEasy**, or **NSubstitute**.
+
+---
+
+## 🔄 Replacing or Decorating Services
+
+### Replacing Services
+
+```csharp
+services.AddSingleton<ILogger, CustomLogger>();
+```
+
+### Decorating Services
+
+Use a wrapper service or middleware approach. For advanced scenarios, consider **Scrutor** or **Autofac** for decorators.
+
+---
+
+## 🧩 Advanced Topics
+
+- Resolving services manually via `IServiceProvider`
+- Using `Func<T>` or factories
+- Injecting scoped services into singletons (use `IServiceScopeFactory`)
+- Splitting service registration across feature modules
+- 3rd-party containers: Autofac, SimpleInjector, Lamar
+
+---
+
+## 🧼 Common Mistakes to Avoid
+
+- Injecting `IServiceProvider` everywhere
+- Resolving services inside constructors manually
+- Registering a service twice with different lifetimes
+
