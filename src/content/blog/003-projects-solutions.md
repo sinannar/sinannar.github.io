@@ -1,7 +1,7 @@
 ---
 title: 'Projects & Solution'
 description: 'Working w Projects'
-pubDate: 'July 11 2025'
+pubDate: 'July 17 2025'
 heroImage: '/003-projects-solutions.png'
 ---
 
