@@ -1,16 +1,12 @@
 ---
 title: '.Net Aspire'
 description: 'Running things locally'
-pubDate: 'July 27 2025'
+pubDate: 'July 28 2025'
 heroImage: '/004-dotnetaspire.jpg'
 ---
 
 ### Intro
-Today we are going to talk about a scenario and how .Net Aspire may help us. Running and debugging microservices is hard and you may directly heard that you should not run them.
-
-In the future, we will deep dive into .Net Aspire with example code but today we are running with an example problem.
-
-Lets focus on our problem first that is represented as a diagram below:
+Today we are going to talk about .Net Aspire. Running and debugging microservices is hard and you may directly heard that you should not run them. In the future, we will deep dive into .Net Aspire with example code repository but today we are running with a bit more of a bird eye view. Lets focus on our problem first that is represented as a diagram below:
 
 ### Problem
 <img width="650px;" src="/004-01-dotnetaspire.png">
@@ -24,9 +20,7 @@ What we have here is:
 6. Storage queue
 7. Azure function that writes to customers api endpoint
 
-If we create a dotnet solution, considering the last endpoint is not our problem, azure functions can be part of the solutuon. There is code in the solution that will be communicating with storage queues and sql database and cosmosdb, but they are infrastructure so they need to be defined with something else. First comes to mind is docker compose.
-
-If we only have a way that can show both infra and consuming resources in one place, with a strongly typed language, that would be amazing. Aspire solves this with C#.
+If we create a dotnet solution, Azure Functions can be part of the dotnet solution. Functions are interacting with queues, sqldb and cosmosdb resources which are either real resources or containerised resources. If it is real resources, we might have bicep or terraform code, if we are luck. For local testing tho, either we need simulators installed or we would use containerised resources. We prefer containerised resources because we can tier them down when we are done with them easily. So we have custom source code for functions, infrastructure code or docker compose for the infrastructure. If we only have a way that can show both infra and consuming resources in one place, with a strongly typed language, that would be amazing. Aspire solves this with C#.
 
 ### Aspire Host
 ```csharp
@@ -118,6 +112,7 @@ The `MapDefaultEndpoints` method:
 - Maps the liveness endpoint to `/alive` route where the health check tag contains live.
 
 ### References:
+0. [.NET Aspire Docs](https://learn.microsoft.com/en-us/dotnet/aspire/)
 1. [Azure Function with Aspire](https://github.com/dotnet/aspire-samples/blob/main/samples/AspireWithAzureFunctions/ImageGallery.AppHost/AppHost.cs)
 2. [Cosmos with Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/database/azure-cosmos-db-integration?tabs=dotnet-cli)
 3. [Sql with Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/database/sql-server-integration?tabs=dotnet-cli%2Cssms)
