@@ -1,5 +1,5 @@
 ---
-title: '.Net Aspire'
+title: 'Intro to .Net Aspire'
 description: 'Running things locally'
 pubDate: 'July 28 2025'
 heroImage: '/004-dotnetaspire.jpg'
