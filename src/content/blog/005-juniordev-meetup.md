@@ -1,5 +1,5 @@
 ---
-title: 'Junior Dev User Group Talk'
+title: '.Net Aspire @ Junior Dev UG'
 description: '.Net Aspire with Code Examples'
 pubDate: 'August 4 2025'
 heroImage: '/005-juniordev-meetup.png'
