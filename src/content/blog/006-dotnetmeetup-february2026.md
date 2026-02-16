@@ -143,6 +143,89 @@ Aspire gives you ability to view traces and metrics locally without setting up a
 <img width="650px;" src="/006/ss-04.png">
 
 ### Sql Servere and CRUD
+Lets start with integrating Sql Server to our application and writing some CRUD operations for the weatherforecast endpoints. We will be using `Aspire.Hosting.SqlServer` package to register a sql server resource in our apphost and then we will use `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package to write the data access code in our apiservice. Lets do those step by step.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % pwd
+/Users/sinannar/source/BlogTemp/AspireCrud
+sinannar@Sinans-MacBook-Pro AspireCrud % aspire add sqlserver
+✔  The package Aspire.Hosting.SqlServer::13.1.1 was added successfully.
+
+sinannar@Sinans-MacBook-Pro AspireCrud % cd AspireCrud.ApiService
+sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % dotnet add package Aspire.Microsoft.EntityFrameworkCore.SqlServer                                                                       
+sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % dotnet add package Microsoft.EntityFrameworkCore.Design
+```
+
+#### Using SQL Server in AppHost
+Now we need to register the sql server resource in our apphost and also we need to configure the connection string for it. We can do this by adding the following code to our apphost code.
+```csharp
+var sql = builder.AddSqlServer("sql");
+var sqldb = sql.AddDatabase("sqldb");
+```
+With this sql and sqldb resource registered, we can now use it in our services by referencing it in the service configuration. We will be doing this in the next step when we configure our apiservice to use the sql server resource.
+```csharp
+var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
+    .WithReference(sqldb).WaitFor(sqldb)
+    .WithHttpHealthCheck("/health");
+```
+
+#### Replacing the WeatherForecast model
+```csharp
+// Find the WeatherForecast record in Program.cs in ApiService project
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+```
+```csharp
+// Replace it with the following code and move it to a new file called WeatherForecast.cs in the same project
+public class WeatherForecast
+{
+    public int Id { get; set; }
+    public DateOnly Date { get; set; }
+    public int TemperatureC { get; set; }
+    public string? Summary { get; set; }
+
+    public string? Description { get; set; }
+
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+```
+This change will break the existing `app.MapGet("/weatherforecast"` endpoint because it is using the old record type, so we need to modify it to use the new class type and also we need to change the implementation to return data from the database instead of returning hardcoded data. We will be using Entity Framework Core to access the database and we will be using the DbContext class to manage the database connection and operations. For now, you can comment out the existing implementation of the endpoint and we will come back to it later after we set up the database and the DbContext. 
+```csharp// Comment out the existing implementation of the endpoint in Program.cs in ApiService project
+// app.MapGet("/weatherforecast", () =>
+// {
+//    ...
+// })
+// .WithName("GetWeatherForecast");
+```
+
+#### Adding DbContext and Repository
+Best practice is creating classes in their own files, but for the sake of the demo, I will be appending the code to the Program.cs file. You can refactor it later if you want. You may want to add `using Microsoft.EntityFrameworkCore;` at the top of the file.
+```csharp
+// Add the following DbContext class to the same project, you can name it AppDbContext.cs
+public class AppDbContext(DbContextOptions<AppDbContext> options)
+    : DbContext(options)
+{
+    public DbSet<WeatherForecast> WeatherForecasts => Set<WeatherForecast>();
+}
+```
+
+#### Configuring the services
+Now we need to configure the services in our apphost to use the sql server resource we registered and also to use the DbContext we created.  
+```csharp
+builder.AddSqlServerDbContext<AppDbContext>("sqldb");
+```
+One important thing here is to note that we are using the `builder.AddSqlServerDbContext` instead of `builder.Services.AddDbContext` because we want to use the best practices implemented in `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package, which will automatically wire up the connection string from the apphost configuration and also it will add some diagnostic enrichment for our DbContext.
+
+I want to put a focus on `"sqldb"` name we are using here, which is the name of database resource we registered in the apphost and now it became availablee for us to use in the api service. 
+<img width="950px;" src="/006/ss-05.png">
+
+This is how the service discovery works in aspire, and if you dig deep into `builder.AddServiceDefaults();` line in the api service configuration, you will see that is actually coming from ServiceDefaults project which has only one `Extensions.cs` file that registers the followings by default:
+- Open Telemetry
+- Default Health Checks
+- Service Discovery
+- Http Client Defaults (eg. Service discovery for http clients, retry policies, etc.)
+
 
 ### Javascript Integration
 
