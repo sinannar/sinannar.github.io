@@ -226,6 +226,135 @@ This is how the service discovery works in aspire, and if you dig deep into `bui
 - Service Discovery
 - Http Client Defaults (eg. Service discovery for http clients, retry policies, etc.)
 
+#### Creating Migrations and Updating the Database
+Before we go and create a migration, I want to add this code piece between `app.MapDefaultEndpoints();` and `app.Run();` to api service so that when the application starts, it automatically run migrations and update the databasep, and insert some random data to test read endpoints.
+```csharp
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+    if (!db.WeatherForecasts.Any())
+    {
+        var rng = new Random();
+        var forecasts = Enumerable.Range(1, 3).Select(index => new WeatherForecast
+        {
+            Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            TemperatureC = rng.Next(-20, 55),
+            Summary = summaries[rng.Next(summaries.Length)]
+        }).ToArray();
+
+        db.WeatherForecasts.AddRange(forecasts);
+        db.SaveChanges();
+    }
+}
+```
+Now we are ready to create migrations, lets navigate to ApiService project and create a migration using the following command.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % pwd
+/Users/sinannar/source/BlogTemp/AspireCrud
+sinannar@Sinans-MacBook-Pro AspireCrud % cd AspireCrud.ApiService
+sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % dotnet ef migrations add InitialWeatherForecast
+Build started...
+Build succeeded.
+The Entity Framework tools version '10.0.0' is older than that of the runtime '10.0.3'. Update the tools for the latest features and bug fixes. See https://aka.ms/AAc1fbw for more information.
+Done. To undo this action, use 'ef migrations remove'
+sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % ls Migrations
+20260216072957_InitialWeatherForecast.cs
+20260216072957_InitialWeatherForecast.Designer.cs
+AppDbContextModelSnapshot.cs
+sinannar@Sinans-MacBook-Pro AspireCrud.ApiService %
+```
+
+#### Update the endpoints for CRUD
+Now we can replace that commented api, `GetWeatherForecast`, with the followings to have the full CRUD operations for our WeatherForecast entity. We will be using the DbContext to access the database and perform the operations.
+```csharp
+app.MapGet("/weatherforecast", async (AppDbContext db) =>
+{
+    return await db.WeatherForecasts
+                   .OrderBy(w => w.Date)
+                   .ToListAsync();
+});
+
+app.MapPost("/weatherforecast", async (WeatherForecast forecast, AppDbContext db) =>
+{
+    db.WeatherForecasts.Add(forecast);
+    await db.SaveChangesAsync();
+    return Results.Created($"/weatherforecast/{forecast.Id}", forecast);
+});
+
+app.MapPut("/weatherforecast/{id:int}", async (int id, WeatherForecast input, AppDbContext db) =>
+{
+    var existing = await db.WeatherForecasts.FindAsync(id);
+    if (existing is null) return Results.NotFound();
+
+    existing.Date = input.Date;
+    existing.TemperatureC = input.TemperatureC;
+    existing.Summary = input.Summary;
+    existing.Description = input.Description;
+
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapDelete("/weatherforecast/{id:int}", async (int id, AppDbContext db) =>
+{
+    var existing = await db.WeatherForecasts.FindAsync(id);
+    if (existing is null) return Results.NotFound();
+
+    db.WeatherForecasts.Remove(existing);
+    await db.SaveChangesAsync();
+    return Results.NoContent();
+});
+
+app.MapPost("/weatherforecast/batch", async (AppDbContext db) =>
+{
+    var rng = new Random();
+    var forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
+    {
+        Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+        TemperatureC = rng.Next(-20, 55),
+        Summary = summaries[rng.Next(summaries.Length)]
+    }).ToArray();
+    db.WeatherForecasts.AddRange(forecasts);
+    await db.SaveChangesAsync();
+    return Results.Created("/weatherforecast/batch", forecasts);
+});
+```
+Before we go further, there is `.http` file in your api project and if you replace the content with the following code, you can easily test your endpoints using the `Rest Client` extension in VS Code. You can also use Postman or any other API testing tool if you prefer. Just keep the `@ApiService_HostAddress` at the top and replace all lines after that with the following code to have the requests for all the endpoints we created.
+```http
+# Get all weather forecasts
+GET {{ApiService_HostAddress}}/weatherforecast/
+Accept: application/json
+###
+POST {{ApiService_HostAddress}}/weatherforecast
+Content-Type: application/json
+
+{
+  "date": "2026-02-15",
+  "temperatureC": 25,
+  "summary": "Warm"
+}
+###
+PUT {{ApiService_HostAddress}}/weatherforecast/1
+Content-Type: application/json
+
+{
+  "date": "2026-02-16",
+  "temperatureC": 30,
+  "summary": "Hot"
+}
+###
+DELETE {{ApiService_HostAddress}}/weatherforecast/1
+
+###
+POST {{ApiService_HostAddress}}/weatherforecast/batch
+Content-Type: application/json
+
+###
+```
+
+As next, run `aspire run` from somewhere in the app and use `.http` file to test your CRUD endpoints. You should see the data being stored in the database and you can also see the logs and metrics on the dashboard.
+<img width="650px;" src="/006/ss-06.png">
 
 ### Javascript Integration
 
