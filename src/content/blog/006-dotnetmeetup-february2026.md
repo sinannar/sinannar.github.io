@@ -107,6 +107,41 @@ sinannar@Sinans-MacBook-Pro AspireCrud % git add .
 sinannar@Sinans-MacBook-Pro AspireCrud % git commit -m "init"
 ```
 
+#### Running the application
+Lets go and run the aspire application to see if everything is working fine. We can run the application from the root of the solution and it will automatically find the AppHost project and run it.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % pwd
+/Users/sinannar/source/BlogTemp/AspireCrud
+sinannar@Sinans-MacBook-Pro AspireCrud % ls
+AspireCrud.ApiService           AspireCrud.slnx
+AspireCrud.AppHost              AspireCrud.Web
+AspireCrud.ServiceDefaults
+sinannar@Sinans-MacBook-Pro AspireCrud % aspire run
+🔍 Finding apphosts...
+AspireCrud.AppHost/AspireCrud.AppHost.csproj
+
+🗄  Created settings file at '.aspire/settings.json'.
+
+     AppHost:  AspireCrud.AppHost/AspireCrud.AppHost.csproj
+
+   Dashboard:  https://localhost:17042/login?t=ecf82c23a3093940e3513da6bcc4d142
+
+        Logs:  /Users/sinannar/.aspire/cli/logs/apphost-8063-2026-02-16-06-49-23.log
+
+               Press CTRL+C to stop the apphost and exit.
+```
+Clicking the url will open aspire dashboard on a browser and you can see the apphost is running and we have 2 services running as well, which are `apiservice` and `webfrontend`. These are the default services created by aspire cli and they are running with the default configuration. We will be modifying these services and adding new ones in the next steps.
+<img width="650px;" src="/006/ss-01.png">
+
+There is graph view for the resources on dashboard, it can be quite useful when your project grows and you have multiple services and resources. You can easily see the dependencies between them and how they are connected. You can also click on each resource to see more details about it, such as the connection strings, environment variables, logs, etc.
+<img width="650px;" src="/006/ss-02.png">
+
+You can see the logs of each service on the dashboard as well, which is pretty useful for debugging and monitoring. This is not limited to your own services, but also includes the logs of the containers you are running as part of your infrastructure, such as sql server, redis, etc. You can see the logs of these containers and services in the same place, which is pretty convenient.
+<img width="650px;" src="/006/ss-03.png">
+
+Aspire gives you ability to view traces and metrics locally without setting up any external monitoring tools. You can see the traces and metrics of your services on the dashboard, which is pretty useful for debugging and performance monitoring. 
+<img width="650px;" src="/006/ss-04.png">
+
 ### Sql Servere and CRUD
 
 ### Javascript Integration
