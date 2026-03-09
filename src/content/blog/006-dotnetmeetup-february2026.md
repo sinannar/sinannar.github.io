@@ -322,7 +322,6 @@ app.MapPost("/weatherforecast/batch", async (AppDbContext db) =>
 ```
 Before we go further, there is `.http` file in your api project and if you replace the content with the following code, you can easily test your endpoints using the `Rest Client` extension in VS Code. You can also use Postman or any other API testing tool if you prefer. Just keep the `@ApiService_HostAddress` at the top and replace all lines after that with the following code to have the requests for all the endpoints we created.
 ```http
-# Get all weather forecasts
 GET {{ApiService_HostAddress}}/weatherforecast/
 Accept: application/json
 ###
