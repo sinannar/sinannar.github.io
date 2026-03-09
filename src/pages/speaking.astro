@@ -1,0 +1,189 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Speaking | ${SITE_TITLE}`} />
+  </head>
+  <body>
+    <Header />
+    <main>
+      <section style="max-width: 900px; margin: 2rem auto;">
+        <h1 style="font-size:2.2rem; margin-bottom:1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;">Public Speaking &amp; Meetups</h1>
+
+        <!-- Organiser Groups -->
+        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Community Groups</h2>
+        <p style="color:#555; margin-bottom:1.2rem;">Meetup groups I help organise:</p>
+        <ul class="group-list">
+          <li>
+            <a href="https://www.meetup.com/coding-night-anz/" target="_blank" rel="noopener noreferrer" class="group-pill">
+              Coding Night ANZ
+            </a>
+          </li>
+          <li>
+            <a href="https://www.meetup.com/akl-net/" target="_blank" rel="noopener noreferrer" class="group-pill">
+              Auckland .NET User Group
+            </a>
+          </li>
+          <li>
+            <a href="https://www.meetup.com/auckland-azure-usergroup/" target="_blank" rel="noopener noreferrer" class="group-pill">
+              Auckland Azure User Group
+            </a>
+          </li>
+          <li>
+            <a href="https://www.meetup.com/auckland-kubernetes/" target="_blank" rel="noopener noreferrer" class="group-pill">
+              Auckland Kubernetes
+            </a>
+          </li>
+          <li>
+            <a href="https://www.meetup.com/juniordev-auckland/" target="_blank" rel="noopener noreferrer" class="group-pill">
+              JuniorDev Auckland
+            </a>
+          </li>
+        </ul>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
+
+        <!-- Presentations (reverse chronological order) -->
+        <h2 style="font-size:1.5rem; margin-bottom:1.2rem;">Presentations</h2>
+
+        <!-- 11 Feb 2026 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/akl-net/events/312937841" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Auckland .NET User Group
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">11 February 2026</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 10 Dec 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/akl-net/events/312148446" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Auckland .NET User Group
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">10 December 2025</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 26 Oct 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/auckland-kubernetes/events/310247791" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Auckland Kubernetes
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">26 October 2025</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 6 Oct 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/juniordev-auckland/events/310074767/" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                JuniorDev Auckland
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">6 October 2025</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 25 Sept 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/coding-night-anz/events/310396975" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Coding Night ANZ
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">25 September 2025</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 16 Sept 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/auckland-azure-usergroup/events/310859388" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Auckland Azure User Group
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">16 September 2025</time>
+          </header>
+        </article>
+
+        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
+
+        <!-- 15 Sept 2025 -->
+        <article style="margin-bottom:2rem;">
+          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
+            <div>
+              <a href="https://www.meetup.com/coding-night-anz/events/310800666" target="_blank" rel="noopener noreferrer"
+                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
+                Coding Night ANZ
+              </a>
+            </div>
+            <time style="color:#666; font-size:0.95rem;">15 September 2025</time>
+          </header>
+        </article>
+
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .group-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .group-pill {
+    display: inline-block;
+    padding: 0.5em 1.1em;
+    background: #f0f4ff;
+    border: 1px solid #c7d3f5;
+    border-radius: 6px;
+    color: #2337ff;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .group-pill:hover {
+    background: #e0e8ff;
+  }
+</style>
