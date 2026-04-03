@@ -356,6 +356,44 @@ As next, run `aspire run` from somewhere in the app and use `.http` file to test
 <img width="650px;" src="/006/ss-06.png">
 
 ### Javascript Integration
+Up until now, we have introduced sqlserver and implement a real CRUD operations for our weatherforecast entity, but we are still using the default Blazor frontend created by aspire cli, which is not bad at all, but I want to show you how you can easily replace it with an Angular frontend and consume the same endpoints we created in the api service.
+
+#### Removing Blazor
+Remove the Blazor FE by running the following commands
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % pwd
+sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference remove AspireCrud.Web/AspireCrud.Web.csproj --project AspireCrud.AppHost/AspireCrud.AppHost.csproj                                                                                            
+Project reference `../AspireCrud.Web/AspireCrud.Web.csproj` removed.
+/Users/sinannar/source/BlogTemp/AspireCrud
+sinannar@Sinans-MacBook-Pro AspireCrud % dotnet sln remove AspireCrud.Web/AspireCrud.Web.csproj
+Project `AspireCrud.Web/AspireCrud.Web.csproj` removed from the solution.
+sinannar@Sinans-MacBook-Pro AspireCrud % rm -rf AspireCrud.Web
+```
+
+Then remove the following code from `AppHost.cs` file to remove the web frontend service configuration.
+```csharp
+builder.AddProject<Projects.AspireCrud_Web>("webfrontend")
+    .WithExternalHttpEndpoints()
+    .WithHttpHealthCheck("/health")
+    .WithReference(apiService)
+    .WaitFor(apiService);
+```
+
+Remaining of `AppHost.cs` file should look like this after the change:
+```csharp
+var builder = DistributedApplication.CreateBuilder(args);
+
+var sql = builder.AddSqlServer("sql");
+var sqldb = sql.AddDatabase("sqldb");
+
+var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
+    .WithReference(sqldb).WaitFor(sqldb)
+    .WithHttpHealthCheck("/health");
+
+builder.Build().Run();
+```
+
+#### Adding Angular
 
 ### Azure Function Integration
 
