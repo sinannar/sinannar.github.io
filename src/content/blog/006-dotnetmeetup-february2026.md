@@ -394,6 +394,71 @@ builder.Build().Run();
 ```
 
 #### Adding Angular
+Before we run into next step of creating angular project, I would like to verify my current setup with the following commands. If you do not have these tools installed, you can easily install them by following the instructions on their official websites. If you have npm installed, you can run `npm install -g @angular/cli` to install angular cli globally on your machine.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % node --version
+v22.15.1
+sinannar@Sinans-MacBook-Pro AspireCrud % npm --version
+11.8.0
+sinannar@Sinans-MacBook-Pro AspireCrud % ng --version
+19.2.12
+```
+By typing `ng new AspiredAngular --style css --routing true --ssr=no` to terminal, at the root of repository, we can create a new angular project with the name `AspiredAngular`. This command will create a new angular project with the default configuration and it will also add the necessary files for us to run the angular application. After running this command, you should see a new folder named `AspiredAngular` in your repository, which contains the angular project. Output will be something like this:
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % ng new AspiredAngular --style css --routing true --ssr=no
+CREATE AspiredAngular/README.md (1478 bytes)
+CREATE AspiredAngular/.editorconfig (314 bytes)
+CREATE AspiredAngular/.gitignore (587 bytes)
+CREATE AspiredAngular/angular.json (2623 bytes)
+CREATE AspiredAngular/package.json (1010 bytes)
+CREATE AspiredAngular/tsconfig.json (915 bytes)
+CREATE AspiredAngular/tsconfig.app.json (424 bytes)
+CREATE AspiredAngular/tsconfig.spec.json (434 bytes)
+CREATE AspiredAngular/.vscode/extensions.json (130 bytes)
+CREATE AspiredAngular/.vscode/launch.json (470 bytes)
+CREATE AspiredAngular/.vscode/tasks.json (938 bytes)
+CREATE AspiredAngular/src/main.ts (250 bytes)
+CREATE AspiredAngular/src/index.html (300 bytes)
+CREATE AspiredAngular/src/styles.css (80 bytes)
+CREATE AspiredAngular/src/app/app.component.css (0 bytes)
+CREATE AspiredAngular/src/app/app.component.html (19903 bytes)
+CREATE AspiredAngular/src/app/app.component.spec.ts (940 bytes)
+CREATE AspiredAngular/src/app/app.component.ts (290 bytes)
+CREATE AspiredAngular/src/app/app.config.ts (310 bytes)
+CREATE AspiredAngular/src/app/app.routes.ts (77 bytes)
+CREATE AspiredAngular/public/favicon.ico (15086 bytes)
+✔ Packages installed successfully.
+    Directory is already under version control. Skipping initialization of git.
+```
+Either you can wait for angular cli to install the packages, or you can open another terminal and start adding javascript integration for our aspire application while the installation is in progress. Since it has been for a while, added packages might change overtime.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % aspire add javascript
+✔  The package Aspire.Hosting.JavaScript::13.1.1 was added successfully.
+```
+We will adapt aspire apphost to serve our angular application by using `AddJavaScriptApp` method, as shown below. With this change, AppHost should look like below
+```csharp
+var builder = DistributedApplication.CreateBuilder(args);
+
+var sql = builder.AddSqlServer("sql");
+var sqldb = sql.AddDatabase("sqldb");
+
+var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
+    .WithReference(sqldb).WaitFor(sqldb)
+    .WithHttpHealthCheck("/health");
+
+var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName: "start")
+    .WithNpm(installCommand: "install")
+    .WithReference(apiService).WaitFor(apiService)
+    .WithUrl("http://localhost:4200")
+    .WithHttpEndpoint(env: "PORT");
+    
+builder.Build().Run();
+```
+
+When you run via `aspire run`, you should see `spa-installer` will be run before `spa` is running.
+<img width="950px;" src="/006/ss-07.png">
+<img width="950px;" src="/006/ss-08.png">
+When everything is ready, you can navigate to `http://localhost:4200` and you should see the default angular application running.
 
 ### Azure Function Integration
 
