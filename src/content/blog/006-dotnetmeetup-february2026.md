@@ -460,6 +460,784 @@ When you run via `aspire run`, you should see `spa-installer` will be run before
 <img width="950px;" src="/006/ss-08.png">
 When everything is ready, you can navigate to `http://localhost:4200` and you should see the default angular application running.
 
+#### Consuming the API from Angular
+Create a new file under angular project called `proxy.conf.json` and populate it with the following
+```js
+module.exports = {
+  "/api": {
+    target:
+      process.env["services__apiservice__https__0"] ||
+      process.env["services__apiservice__http__0"],
+    secure: false,
+    changeOrigin: true,
+    pathRewrite: {
+      "^/api": "",
+    },
+    logLevel: "debug"
+  },
+};
+```
+Then update `angular.json` file to include the proxy configuration in the serve options in `projects.AspiredAngular.architect.serve.options` section, as shown below
+```json
+{
+  "projects": {
+    // other properties
+    "AspiredAngular": {
+      // other properties
+      "architect": {
+        // other properties
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.js"
+          },
+        },
+      }
+    }
+  }
+}
+```
+Create the weatherforecast model `AspireCrud/AspiredAngular/src/app/models/weather-forecast.model.ts` with the following content
+```typescript
+export interface WeatherForecast {
+  id?: number;
+  date: string;
+  temperatureC: number;
+  temperatureF?: number;
+  summary: string;
+  description?: string;
+}
+```
+Create the weather service `AspireCrud/AspiredAngular/src/app/services/weather.service.ts` with the following content
+```typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { WeatherForecast } from '../models/weather-forecast.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class WeatherService {
+  private apiUrl = '/api/weatherforecast';
+
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<WeatherForecast[]> {
+    return this.http.get<WeatherForecast[]>(this.apiUrl);
+  }
+
+  create(forecast: WeatherForecast): Observable<WeatherForecast> {
+    return this.http.post<WeatherForecast>(this.apiUrl, forecast);
+  }
+
+  update(id: number, forecast: WeatherForecast): Observable<void> {
+    return this.http.put<void>(`${this.apiUrl}/${id}`, forecast);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  createBatch(): Observable<WeatherForecast[]> {
+    return this.http.post<WeatherForecast[]>(`${this.apiUrl}/batch`, null);
+  }
+
+  getById(id: number): Observable<WeatherForecast> {
+    return this.http.get<WeatherForecast>(`${this.apiUrl}/${id}`);
+  }
+}
+```
+Update `app.config.ts` file to provide http client configuration for our api service, as shown below
+```typescript
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }), 
+    provideRouter(routes),
+    provideHttpClient()
+  ]
+};
+```
+Update `app.component.ts` file to consume the weather service and display the data in the UI, as shown below
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { WeatherService } from './services/weather.service';
+import { WeatherForecast } from './models/weather-forecast.model';
+
+@Component({
+  selector: 'app-root',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
+})
+export class AppComponent implements OnInit {
+  title = 'Weather Forecast Manager';
+  forecasts: WeatherForecast[] = [];
+  loading = false;
+  error: string | null = null;
+  
+  // Form model
+  formModel: WeatherForecast = {
+    date: new Date().toISOString().split('T')[0],
+    temperatureC: 20,
+    summary: '',
+    description: ''
+  };
+  
+  isEditing = false;
+  showForm = false;
+
+  constructor(private weatherService: WeatherService) {}
+
+  ngOnInit(): void {
+    this.loadForecasts();
+  }
+
+  loadForecasts(): void {
+    this.loading = true;
+    this.error = null;
+    this.weatherService.getAll().subscribe({
+      next: (data) => {
+        console.log('Loaded forecasts:', data);
+        this.forecasts = data;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load forecasts: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  createForecast(): void {
+    this.loading = true;
+    this.error = null;
+    this.weatherService.create(this.formModel).subscribe({
+      next: (forecast) => {
+        this.forecasts.push(forecast);
+        this.resetForm();
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to create forecast: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  editForecast(forecast: WeatherForecast): void {
+    this.formModel = { ...forecast };
+    this.isEditing = true;
+    this.showForm = true;
+  }
+
+  updateForecast(): void {
+    if (!this.formModel?.id) return;
+    
+    this.loading = true;
+    this.error = null;
+    const updatedData = { ...this.formModel };
+    this.weatherService.update(this.formModel.id, this.formModel).subscribe({
+      next: () => {
+        // Update successful (204 No Content), update local data
+        const index = this.forecasts.findIndex(f => f.id === updatedData.id);
+        if (index !== -1) {
+          this.forecasts[index] = updatedData;
+        }
+        this.cancelEdit();
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to update forecast: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  deleteForecast(id: number | undefined): void {
+    if (!id || !confirm('Are you sure you want to delete this forecast?')) return;
+    
+    this.loading = true;
+    this.error = null;
+    this.weatherService.delete(id).subscribe({
+      next: () => {
+        this.forecasts = this.forecasts.filter(f => f.id !== id);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to delete forecast: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  createBatch(): void {
+    this.loading = true;
+    this.error = null;
+    this.weatherService.createBatch().subscribe({
+      next: (newForecasts) => {
+        this.forecasts.push(...newForecasts);
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to create batch: ' + err.message;
+        this.loading = false;
+      }
+    });
+  }
+
+  resetForm(): void {
+    this.formModel = {
+      date: new Date().toISOString().split('T')[0],
+      temperatureC: 20,
+      summary: '',
+      description: ''
+    };
+    this.isEditing = false;
+    this.showForm = false;
+  }
+
+  cancelEdit(): void {
+    this.resetForm();
+  }
+
+  getTemperatureF(temperatureC: number): number {
+    return Math.round(32 + temperatureC * 9 / 5);
+  }
+
+  getTemperatureColor(tempC: number): string {
+    if (tempC < 0) return '#3b82f6'; // blue
+    if (tempC < 15) return '#06b6d4'; // cyan
+    if (tempC < 25) return '#10b981'; // green
+    if (tempC < 35) return '#f59e0b'; // orange
+    return '#ef4444'; // red
+  }
+}
+```
+update `app.component.html` file to display the data and provide UI for CRUD operations, as shown below
+```html
+<div class="container">
+  <header>
+    <h1>🌤️ {{ title }}</h1>
+    <p class="subtitle">Manage your weather forecasts with full CRUD operations</p>
+  </header>
+
+  <!-- Error Message -->
+  <div class="error" *ngIf="error">
+    <span>⚠️ {{ error }}</span>
+    <button (click)="error = null" class="close-btn">×</button>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button (click)="showForm = !showForm; isEditing = false; resetForm()" class="btn btn-primary">
+      {{ showForm ? '❌ Cancel' : '➕ New Forecast' }}
+    </button>
+    <button (click)="createBatch()" class="btn btn-secondary" [disabled]="loading">
+      📦 Create Batch
+    </button>
+    <button (click)="loadForecasts()" class="btn btn-secondary" [disabled]="loading">
+      🔄 Refresh
+    </button>
+  </div>
+
+  <!-- Create/Edit Form -->
+  <div class="form-card" *ngIf="showForm">
+    <h2>{{ isEditing ? '✏️ Edit Forecast' : '➕ Create New Forecast' }}</h2>
+    <form (ngSubmit)="isEditing ? updateForecast() : createForecast()">
+      <div class="form-group">
+        <label for="date">Date</label>
+        <input
+          type="date"
+          id="date"
+          [(ngModel)]="formModel.date"
+          name="date"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="temperature">Temperature (°C)</label>
+        <input
+          type="number"
+          id="temperature"
+          [(ngModel)]="formModel.temperatureC"
+          name="temperature"
+          required
+        />
+        <small>
+          ≈ {{ getTemperatureF(formModel.temperatureC) }}°F
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="summary">Summary</label>
+        <select
+          id="summary"
+          [(ngModel)]="formModel.summary"
+          name="summary"
+          required
+        >
+          <option value="">Select weather...</option>
+          <option value="Freezing">❄️ Freezing</option>
+          <option value="Bracing">🥶 Bracing</option>
+          <option value="Chilly">🧊 Chilly</option>
+          <option value="Cool">😌 Cool</option>
+          <option value="Mild">🌤️ Mild</option>
+          <option value="Warm">☀️ Warm</option>
+          <option value="Balmy">🌞 Balmy</option>
+          <option value="Hot">🔥 Hot</option>
+          <option value="Sweltering">🥵 Sweltering</option>
+          <option value="Scorching">♨️ Scorching</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          [(ngModel)]="formModel.description"
+          name="description"
+          rows="3"
+          placeholder="Add detailed weather description..."
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success" [disabled]="loading">
+          {{ isEditing ? '💾 Update' : '✅ Create' }}
+        </button>
+        <button type="button" (click)="cancelEdit(); resetForm()" class="btn btn-secondary">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Forecasts Grid -->
+  <div class="forecasts-grid" *ngIf="!loading">
+    <div class="forecast-card" *ngFor="let forecast of forecasts">
+      <div class="forecast-header" [style.background]="getTemperatureColor(forecast.temperatureC)">
+        <h3>{{ forecast.date | date: 'MMM d, y' }}</h3>
+      </div>
+      <div class="forecast-body">
+        <div class="temperature">
+          <span class="temp-c">{{ forecast.temperatureC }}°C</span>
+          <span class="temp-f">{{ getTemperatureF(forecast.temperatureC) }}°F</span>
+        </div>
+        <div class="summary">{{ forecast.summary }}</div>
+        <div class="description" *ngIf="forecast.description && forecast.description.trim().length > 0">
+          {{ forecast.description }}
+        </div>
+        <div class="forecast-id">ID: {{ forecast.id }}</div>
+      </div>
+      <div class="forecast-actions">
+        <button (click)="editForecast(forecast)" class="btn-icon" title="Edit">
+          ✏️
+        </button>
+        <button (click)="deleteForecast(forecast.id)" class="btn-icon btn-danger" title="Delete">
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && forecasts.length === 0">
+    <p>📭 No forecasts found</p>
+    <p>Create your first forecast or load a batch!</p>
+  </div>
+</div>
+```
+
+Update `app.component.css` file to add some basic styling, as shown below
+```css
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  color: #ffffff;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-weight: 700;
+}
+
+.subtitle {
+  color: #f0f4ff;
+  font-size: 1.1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Error Message */
+.error {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 2px solid #ef4444;
+  color: #7f1d1d;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  font-weight: 500;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #991b1b;
+  transition: transform 0.2s;
+}
+
+.close-btn:hover {
+  transform: scale(1.2);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+
+/* Form Card */
+.form-card {
+  background: linear-gradient(to bottom, #ffffff 0%, #f8fafc 100%);
+  border: 2px solid #e0e7ff;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.form-card h2 {
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  color: #475569;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.form-group small {
+  display: block;
+  margin-top: 0.5rem;
+  color: #64748b;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 3rem;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+.loading p {
+  color: #ffffff;
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Forecasts Grid */
+.forecasts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.forecast-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.forecast-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+.forecast-header {
+  padding: 1.25rem;
+  color: white;
+  text-align: center;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.forecast-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+}
+
+.forecast-body {
+  padding: 1.5rem;
+}
+
+.temperature {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.temp-c {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1e293b;
+}
+
+.temp-f {
+  font-size: 1.25rem;
+  color: #64748b;
+}
+
+.summary {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #475569;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.description {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.forecast-id {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.forecast-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: linear-gradient(135deg, #e0e7ff 0%, #ddd6fe 100%);
+  transform: scale(1.15);
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+}
+
+.empty-state p {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .forecasts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+```
+
+When you run `aspire run` and navigate to `http://localhost:4200`, you should see the angular application with the weather forecasts being loaded from the api service. You can create, update, delete and create batch of forecasts using the UI and see the changes being reflected in the database. You can also see the logs and metrics on the dashboard for both api service and angular frontend.
+<img width="650px;" src="/006/ss-09.png">
+
+You can edit an item, create a batch of them, and delete them as well. All operations should be working seamlessly and you should see the changes in the UI immediately after performing any action. This is the power of having a distributed application with a well-defined API and a decoupled frontend.
+<img width="650px;" src="/006/ss-10.png">
+
+
 ### Azure Function Integration
 
 ### Github Models Integration
