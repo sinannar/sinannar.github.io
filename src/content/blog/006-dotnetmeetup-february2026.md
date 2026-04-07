@@ -1465,9 +1465,9 @@ With all the code is put in place, we should see function working on our traces 
 <img width="650px;" src="/006/ss-13.png">
 <img width="650px;" src="/006/ss-14.png">
 
-What does this function do is that fix the description of weather forecast that was randomised before
+What does this function do is that fix the summary of weather forecast that was randomised before
 <img width="650px;" src="/006/ss-15.png">
 <img width="650px;" src="/006/ss-16.png">
 
 ### Github Models Integration
-
+With Github Models, we can put a better summary for our weather forecast description. We are going to work on it now in this section.
