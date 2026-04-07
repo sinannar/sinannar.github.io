@@ -1251,12 +1251,27 @@ Project `AspireCrud.Function/AspireCrud_Function.csproj` added to the solution.
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.Function/AspireCrud_Function.csproj --project AspireCrud.AppHost/AspireCrud.AppHost.csproj
 Reference `..\AspireCrud.Function\AspireCrud_Function.csproj` added to the project.
 ```
+
+Currently my `func` cli creates the azure function with `net8.0` target framework but we are working with `net10.0` so we need to update the target framework of the function project to `net10.0` by editing the `AspireCrud.Function.csproj` file and changing the `TargetFramework` property to `net10.0`, as shown below
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+</Project>
+```
+Then we will reference ServiceDefault project to our function project to use opinionated best practices by running the following command in terminal
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.ServiceDefaults/AspireCrud.ServiceDefaults.csproj --project AspireCrud.Function/AspireCrud_Function.csproj
+Reference `..\AspireCrud.ServiceDefaults\AspireCrud.ServiceDefaults.csproj` added to the project.
+```
+
 Since we successfully created the function project and added it to our solution, lets work on our aspire setup.
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-storage
-✔  The package Aspire.Hosting.Azure.Storage::13.2.1 was added successfully.
+✔  The package Aspire.Hosting.Azure.Storage::13.1.1 was added successfully.
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-functions
-✔  The package Aspire.Hosting.Azure.Functions::13.2.1 was added successfully.
+✔  The package Aspire.Hosting.Azure.Functions::13.1.1 was added successfully.
 ```
 
 We should update our `AppHost.cs` to add function project and azure storage configuration to used by Azure Function. Code should look like below:
@@ -1290,7 +1305,169 @@ When we run the application with `aspire run`, you can also see the dependency g
 <img width="650px;" src="/006/ss-11.png">
 <img width="650px;" src="/006/ss-12.png">
 
+#### Creating a Function and Interacting with API Service
+Lets create the function that will be triggerred by timer via running `func new` in `AspireCrud.Function` project.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % cd AspireCrud.Function 
+sinannar@Sinans-MacBook-Pro AspireCrud.Function % func new --name WeatherSummaryEnricher --template "Timer trigger"
+'local.settings.json' found in root directory (/Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.Function).
+Resolving worker runtime to 'dotnet-isolated'.
+Template: Timer trigger
+Function name: [Timer trigger] WeatherSummaryEnricher
 
+Creating dotnet function...
+The function "WeatherSummaryEnricher" was created successfully from the "Timer trigger" template.
+```
+Lets work on our `Program.cs` on our function project by adding http client to call api service.
+```csharp
+using System.Net.Http.Json;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
+var builder = FunctionsApplication.CreateBuilder(args);
+
+builder.ConfigureFunctionsWebApplication();
+builder.AddServiceDefaults();
+
+builder.Services
+    .AddApplicationInsightsTelemetryWorkerService()
+    .ConfigureFunctionsApplicationInsights();
+
+builder.Services.AddHttpClient<WeatherForecastClient>(client =>
+{
+    client.BaseAddress = new Uri("https+http://apiservice");
+});
+
+builder.Build().Run();
+
+
+public class WeatherForecastClient
+{
+    private readonly HttpClient _httpClient;
+
+    public WeatherForecastClient(HttpClient httpClient)
+    {
+        _httpClient = httpClient;
+    }
+
+    public async Task<List<WeatherForecast>?> GetAllForecastsAsync(CancellationToken cancellationToken = default)
+    {
+        return await _httpClient.GetFromJsonAsync<List<WeatherForecast>>("/weatherforecast", cancellationToken);
+    }
+
+    public async Task<WeatherForecast?> CreateForecastAsync(WeatherForecast forecast, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("/weatherforecast", forecast, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<WeatherForecast>(cancellationToken: cancellationToken);
+    }
+
+    public async Task UpdateForecastAsync(int id, WeatherForecast forecast, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"/weatherforecast/{id}", forecast, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task DeleteForecastAsync(int id, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.DeleteAsync($"/weatherforecast/{id}", cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<WeatherForecast>?> CreateBatchForecastsAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsync("/weatherforecast/batch", null, cancellationToken);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<List<WeatherForecast>>(cancellationToken: cancellationToken);
+    }
+}
+
+public class WeatherForecast
+{
+    public int Id { get; set; }
+    public DateOnly Date { get; set; }
+    public int TemperatureC { get; set; }
+    public string? Summary { get; set; }
+    public string? Description { get; set; }
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+```
+
+We need to update our `WeatherSummaryEnricher.cs` function as below
+```csharp
+using System;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Logging;
+
+namespace AspireCrud.Function;
+
+public class WeatherSummaryEnricher(ILoggerFactory loggerFactory, WeatherForecastClient weatherClient)
+{
+    private readonly ILogger _logger = loggerFactory.CreateLogger<WeatherSummaryEnricher>();
+
+    [Function("WeatherSummaryEnricher")]
+    public async Task Run([TimerTrigger("30 * * * * *")] TimerInfo myTimer, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("C# Timer trigger function executed at: {executionTime}", DateTime.Now);
+
+        if (myTimer.ScheduleStatus is not null)
+        {
+            _logger.LogInformation("Next timer schedule at: {nextSchedule}", myTimer.ScheduleStatus.Next);
+        }
+
+        try
+        {
+            var forecasts = await weatherClient.GetAllForecastsAsync(cancellationToken);
+            _logger.LogInformation("Successfully retrieved {count} weather forecasts", forecasts?.Count ?? 0);
+
+            foreach (var forecast in forecasts ?? [])
+            {
+                _logger.LogInformation("Forecast for {date}: {summary} with {tempC}°C", forecast.Date, forecast.Summary, forecast.TemperatureC);
+
+                // Determine correct summary based on temperature
+                var correctSummary = forecast.TemperatureC switch
+                {
+                    < 0 => "Freezing",
+                    >= 0 and <= 5 => "Bracing",
+                    >= 6 and <= 10 => "Chilly",
+                    >= 11 and <= 15 => "Cool",
+                    >= 16 and <= 20 => "Mild",
+                    >= 21 and <= 25 => "Warm",
+                    >= 26 and <= 30 => "Balmy",
+                    >= 31 and <= 35 => "Hot",
+                    >= 36 and <= 45 => "Sweltering",
+                    _ => "Scorching"
+                };
+
+                // Update if summary is incorrect
+                if (forecast.Summary != correctSummary || string.IsNullOrEmpty(forecast.Description))
+                {
+                    _logger.LogInformation("Updating forecast {id}: '{oldSummary}' -> '{newSummary}'",
+                        forecast.Id, forecast.Summary, correctSummary);
+
+                    forecast.Summary = correctSummary;
+                    await weatherClient.UpdateForecastAsync(forecast.Id, forecast, cancellationToken);
+                }
+            }
+
+            _logger.LogInformation("Weather summary enrichment completed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error calling ApiService");
+        }
+    }
+}
+```
+With all the code is put in place, we should see function working on our traces calling our APIs.
+<img width="650px;" src="/006/ss-13.png">
+<img width="650px;" src="/006/ss-14.png">
+
+What does this function do is that fix the description of weather forecast that was randomised before
+<img width="650px;" src="/006/ss-15.png">
+<img width="650px;" src="/006/ss-16.png">
 
 ### Github Models Integration
 
