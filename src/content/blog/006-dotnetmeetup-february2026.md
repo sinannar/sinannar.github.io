@@ -1239,6 +1239,58 @@ You can edit an item, create a batch of them, and delete them as well. All opera
 
 
 ### Azure Function Integration
+#### Creating Azure Function Project and Integration with Aspire
+Now we are going to create an azure function and leverage aspire to integrate it with our existing application. Azure functions are serverless compute services that allow you to run code on-demand without having to worry about infrastructure. With aspire, we can easily add an azure function to our application and have it interact with our existing services and database. To add an azure function, we are going to use `func` cli. By following the commands below, you can create a new function project and add it to our existing solution.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % func --version
+4.5.0
+sinannar@Sinans-MacBook-Pro AspireCrud % func init AspireCrud.Function --worker-runtime dotnet-isolated
+Writing /Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.Function/.vscode/extensions.json
+sinannar@Sinans-MacBook-Pro AspireCrud % dotnet sln add AspireCrud.Function/AspireCrud_Function.csproj 
+Project `AspireCrud.Function/AspireCrud_Function.csproj` added to the solution.
+sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.Function/AspireCrud_Function.csproj --project AspireCrud.AppHost/AspireCrud.AppHost.csproj
+Reference `..\AspireCrud.Function\AspireCrud_Function.csproj` added to the project.
+```
+Since we successfully created the function project and added it to our solution, lets work on our aspire setup.
+```shell
+sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-storage
+✔  The package Aspire.Hosting.Azure.Storage::13.2.1 was added successfully.
+sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-functions
+✔  The package Aspire.Hosting.Azure.Functions::13.2.1 was added successfully.
+```
+
+We should update our `AppHost.cs` to add function project and azure storage configuration to used by Azure Function. Code should look like below:
+```csharp
+var builder = DistributedApplication.CreateBuilder(args);
+
+var storage = builder.AddAzureStorage("storage")
+    .RunAsEmulator();
+
+var sql = builder.AddSqlServer("sql");
+var sqldb = sql.AddDatabase("sqldb");
+
+
+var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
+    .WithReference(sqldb).WaitFor(sqldb)
+    .WithHttpHealthCheck("/health");
+
+var function = builder.AddAzureFunctionsProject<Projects.AspireCrud_Function>("function")
+    .WithReference(apiService).WaitFor(apiService)
+    .WithHostStorage(storage);
+
+var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName: "start")
+    .WithNpm(installCommand: "install")
+    .WithReference(apiService).WaitFor(apiService)
+    .WithUrl("http://localhost:4200")
+    .WithHttpEndpoint(env: "PORT");
+
+builder.Build().Run();
+```
+When we run the application with `aspire run`, you can also see the dependency graph in the dashboard.
+<img width="650px;" src="/006/ss-11.png">
+<img width="650px;" src="/006/ss-12.png">
+
+
 
 ### Github Models Integration
 
