@@ -6,7 +6,7 @@ heroImage: '/006-dotnetmeetup-february2026.jpg'
 ---
 
 ### Intro
-During the 1(one) hour session, I have presented the followings, which will be covered here as step by step guide with references used:
+During [this](https://www.youtube.com/watch?v=iRWv_ExEzfI) one hour presentation at Auckland .Net User Group, I covered the following topics, which will be detailed here as a step-by-step guide with references used:
 1. Requirements
 2. Creating a new project using aspire cli
 3. Integrating Sql Server and writing CRUD for weathereforecast endpoints
@@ -14,11 +14,10 @@ During the 1(one) hour session, I have presented the followings, which will be c
 5. Integrating Azure Functions to run background jobs
 6. Using GitHub Models to enhance data
 
+Final code can be found at [github](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026) and I would recommend to reference the files whenever needed.
+
 ### Requirements
-To run this demo together, you will need dotnet sdk, aspire cli, func cli and angular cli with nodejs installed on your machine. These are easy to install and you can find the instructions on their official websites. 
-
-Below you can see the versions of the tools I have usede during the demo, which are mostly lateest version other than the angular itself. 
-
+To run this demo together, you will need dotnet sdk, aspire cli, func cli and angular cli with nodejs installed on your machine. These are easy to install and you can find the instructions on their official websites. Below you can see the versions of the tools I have used during the demo, which are mostly latest version other than the angular itself. 
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % dotnet --list-sdks
 8.0.409 [/usr/local/share/dotnet/sdk]
@@ -38,6 +37,7 @@ sinannar@Sinans-MacBook-Pro BlogTemp % aspire --version
 sinannar@Sinans-MacBook-Pro BlogTemp % func version
 4.5.0
 ```
+<i>PS: It took ages to compile this blog post so there is new version of aspire, 13.2, which might appear on screenshots</i>
 
 ### Project Setup
 We are going to start using aspire cli to create a new project.
@@ -1598,3 +1598,5 @@ With this way, our function is calling our API to enrich the weather forecasts w
 - [Azure Function | .NET Aspire Integration](https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-aspire-integration)
 - [Tech Comm | Github Model Catalog](https://techcommunity.microsoft.com/blog/educatordeveloperblog/github-model-catalog---getting-started/4212711)
 - [Github Models](https://github.com/marketplace?type=models)
+- [Code](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026)
+- [Video](https://www.youtube.com/watch?v=iRWv_ExEzfI)
