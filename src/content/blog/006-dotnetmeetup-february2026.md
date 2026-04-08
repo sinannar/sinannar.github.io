@@ -1,7 +1,7 @@
 ---
 title: 'Aspire @ .Net Meetup | February 2026'
 description: 'Aspire Hands on Demo'
-pubDate: 'February 13 2026'
+pubDate: 'April 5 2026'
 heroImage: '/006-dotnetmeetup-february2026.jpg'
 ---
 
