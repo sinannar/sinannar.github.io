@@ -184,7 +184,7 @@ AspireCrud.AppHost/AspireCrud.AppHost.csproj
 ```
 Aspire will automatically detect the AppHost project and start the entire application:
 
-##### Exploring the Aspire Dashboard
+#### Exploring the Aspire Dashboard
 
 Once the app is running, open the dashboard URL in your browser. You’ll see that Aspire has already started two services:
 - apiservice
@@ -193,11 +193,11 @@ Once the app is running, open the dashboard URL in your browser. You’ll see th
 These are the default services created by the template, running with minimal configuration. We’ll extend and customise them in the next steps.
 <img width="650px;" src="/006/ss-01.png">
 
-##### Visualising Your Architecture
+#### Visualising Your Architecture
 One of the most useful features of Aspire is the `graph view`, which shows how your services and resources are connected. As your application grows, this becomes incredibly valuable—you can quickly understand dependencies and interactions across your system.
 <img width="650px;" src="/006/ss-02.png">
 
-##### Centralised Logs and Built-in Observability
+#### Centralised Logs and Built-in Observability
 You can see the logs of each service on the dashboard as well, which is pretty useful for debugging and monitoring. This is not limited to your own services, but also includes the logs of the containers you are running as part of your infrastructure, such as sql server, redis, etc. You can see the logs of these containers and services in the same place, which is pretty convenient.
 <img width="650px;" src="/006/ss-03.png">
 
@@ -215,7 +215,12 @@ Aspire gives you ability to view traces and metrics locally without setting up a
 <!--  -->
 
 ### Sql Servere and CRUD
-Lets start with integrating Sql Server to our application and writing some CRUD operations for the weatherforecast endpoints. We will be using `Aspire.Hosting.SqlServer` package to register a sql server resource in our apphost and then we will use `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package to write the data access code in our apiservice. Lets do those step by step.
+Now let’s extend the application by integrating SQL Server and implementing CRUD operations for the WeatherForecast endpoints. To do that, we’ll use two packages:
+- `Aspire.Hosting.SqlServer` to register SQL Server as a resource in the AppHost
+- `Aspire.Microsoft.EntityFrameworkCore.SqlServer` to integrate Entity Framework Core into the API service
+- `Microsoft.EntityFrameworkCore.Design` to enable migrations and design-time features for Entity Framework Core
+
+Let’s start by adding the required packages:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -228,19 +233,24 @@ sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % dotnet add package Microsoft
 ```
 
 #### Using SQL Server in AppHost
-Now we need to register the sql server resource in our apphost and also we need to configure the connection string for it. We can do this by adding the following code to our apphost code.
+Next, we need to register SQL Server in the AppHost and create a database resource that our API service can use. Add the following code to the AppHost:
 ```csharp
 var sql = builder.AddSqlServer("sql");
 var sqldb = sql.AddDatabase("sqldb");
 ```
-With this sql and sqldb resource registered, we can now use it in our services by referencing it in the service configuration. We will be doing this in the next step when we configure our apiservice to use the sql server resource.
+This registers a SQL Server resource named sql and a database named sqldb.
+
+Once the database resource is available, we can reference it from other services. In this case, we’ll wire it into the API service configuration:
 ```csharp
 var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
     .WithReference(sqldb).WaitFor(sqldb)
     .WithHttpHealthCheck("/health");
 ```
 
-#### Replacing the WeatherForecast model
+With that in place, Aspire can automatically make the database connection available to the API service. In the next step, we’ll configure the API project to use this database through Entity Framework Core.
+
+#### Replacing the `WeatherForecast` model
+The default template includes a simple WeatherForecast record in Program.cs:
 ```csharp
 // Find the WeatherForecast record in Program.cs in ApiService project
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
@@ -248,6 +258,7 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 ```
+To support persistence with Entity Framework Core, we need to replace this with a proper entity class that includes an Id property and can be mapped to a database table:
 ```csharp
 // Replace it with the following code and move it to a new file called WeatherForecast.cs in the same project
 public class WeatherForecast
@@ -262,8 +273,11 @@ public class WeatherForecast
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 ```
-This change will break the existing `app.MapGet("/weatherforecast"` endpoint because it is using the old record type, so we need to modify it to use the new class type and also we need to change the implementation to return data from the database instead of returning hardcoded data. We will be using Entity Framework Core to access the database and we will be using the DbContext class to manage the database connection and operations. For now, you can comment out the existing implementation of the endpoint and we will come back to it later after we set up the database and the DbContext. 
-```csharp// Comment out the existing implementation of the endpoint in Program.cs in ApiService project
+This change introduces an Id property for database storage and a Description field so we can enrich the model later.
+
+Because the existing GET /weatherforecast endpoint still relies on the original record and returns hard-coded data, it will no longer fit our updated model. For now, comment it out and we’ll replace it once the database and DbContext are in place.
+```csharp
+// Comment out the existing implementation of the endpoint in Program.cs in ApiService project
 // app.MapGet("/weatherforecast", () =>
 // {
 //    ...
@@ -271,8 +285,16 @@ This change will break the existing `app.MapGet("/weatherforecast"` endpoint bec
 // .WithName("GetWeatherForecast");
 ```
 
-#### Adding DbContext and Repository
-Best practice is creating classes in their own files, but for the sake of the demo, I will be appending the code to the Program.cs file. You can refactor it later if you want. You may want to add `using Microsoft.EntityFrameworkCore;` at the top of the file.
+#### Adding DbContext
+To work with the database, we need to introduce a DbContext.
+
+While it’s best practice to place classes in separate files, for the sake of this demo we’ll keep everything in Program.cs. You can refactor this later if needed.
+
+Make sure you have the following using statement:
+```csharp
+using Microsoft.EntityFrameworkCore;
+```
+Then add the DbContext:
 ```csharp
 // Add the following DbContext class to the same project, you can name it AppDbContext.cs
 public class AppDbContext(DbContextOptions<AppDbContext> options)
@@ -282,24 +304,36 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 }
 ```
 
-#### Configuring the services
-Now we need to configure the services in our apphost to use the sql server resource we registered and also to use the DbContext we created.  
+#### Configuring the Database (Aspire Way)
+Next, we need to configure the API service to use the SQL Server resource we registered earlier.  
 ```csharp
 builder.AddSqlServerDbContext<AppDbContext>("sqldb");
 ```
-One important thing here is to note that we are using the `builder.AddSqlServerDbContext` instead of `builder.Services.AddDbContext` because we want to use the best practices implemented in `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package, which will automatically wire up the connection string from the apphost configuration and also it will add some diagnostic enrichment for our DbContext.
+Instead of using the traditional `builder.Services.AddDbContext`, Aspire provides `AddSqlServerDbContext`, which:
+- Automatically resolves the connection string from AppHost
+- Integrates with Aspire’s service discovery
+- Adds diagnostic and telemetry enrichment out of the box
 
-I want to put a focus on `"sqldb"` name we are using here, which is the name of database resource we registered in the apphost and now it became availablee for us to use in the api service. 
+The `"sqldb"` name is important—it matches the database resource we defined in the AppHost and is how Aspire wires everything together.
 <img width="950px;" src="/006/ss-05.png">
 
-This is how the service discovery works in aspire, and if you dig deep into `builder.AddServiceDefaults();` line in the api service configuration, you will see that is actually coming from ServiceDefaults project which has only one `Extensions.cs` file that registers the followings by default:
+#### Behind the Scenes: Service Defaults
+A lot of this “magic” comes from the default configuration added via:
+```csharp
+builder.AddServiceDefaults();
+```
+This pulls in shared setup from the ServiceDefaults project, which includes:
 - Open Telemetry
 - Default Health Checks
 - Service Discovery
 - Http Client Defaults (eg. Service discovery for http clients, retry policies, etc.)
 
+This is one of the key benefits of Aspire—it standardises these concerns so you don’t have to configure them manually for every service.
+
 #### Creating Migrations and Updating the Database
-Before we go and create a migration, I want to add this code piece between `app.MapDefaultEndpoints();` and `app.Run();` to api service so that when the application starts, it automatically run migrations and update the databasep, and insert some random data to test read endpoints.
+Before creating a migration, let’s add a small piece of code to automatically apply migrations and seed some data when the application starts.
+
+Place the following between `app.MapDefaultEndpoints();` and `app.Run();` in the API service:
 ```csharp
 using (var scope = app.Services.CreateScope())
 {
@@ -320,7 +354,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 ```
-Now we are ready to create migrations, lets navigate to ApiService project and create a migration using the following command.
+This ensures that:
+- The database schema is automatically updated on startup
+- Some sample data is inserted for testing the read endpoints
+
+#### Creating the Migration
+Now we’re ready to create our first migration. Navigate to the ApiService project and run:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -336,9 +375,12 @@ sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % ls Migrations
 AppDbContextModelSnapshot.cs
 sinannar@Sinans-MacBook-Pro AspireCrud.ApiService %
 ```
+A new Migrations folder will be created containing the generated migration files.
 
-#### Update the endpoints for CRUD
-Now we can replace that commented api, `GetWeatherForecast`, with the followings to have the full CRUD operations for our WeatherForecast entity. We will be using the DbContext to access the database and perform the operations.
+#### Implementing CRUD Endpoints
+Now we can replace the previously commented GET /weatherforecast endpoint with a full set of CRUD operations backed by the database.
+
+These endpoints use AppDbContext to interact with SQL Server:
 ```csharp
 app.MapGet("/weatherforecast", async (AppDbContext db) =>
 {
@@ -392,7 +434,13 @@ app.MapPost("/weatherforecast/batch", async (AppDbContext db) =>
     return Results.Created("/weatherforecast/batch", forecasts);
 });
 ```
-Before we go further, there is `.http` file in your api project and if you replace the content with the following code, you can easily test your endpoints using the `Rest Client` extension in VS Code. You can also use Postman or any other API testing tool if you prefer. Just keep the `@ApiService_HostAddress` at the top and replace all lines after that with the following code to have the requests for all the endpoints we created.
+At this point, the API is fully wired to the database and supports standard create, read, update, and delete operations.
+
+#### Testing the Endpoints
+You can quickly test these endpoints using the .http file included in the API project.
+
+If you’re using VS Code, the REST Client extension makes this especially convenient. Alternatively, you can use tools like Postman or curl.
+
 ```http
 GET {{ApiService_HostAddress}}/weatherforecast/
 Accept: application/json
@@ -424,7 +472,16 @@ Content-Type: application/json
 ###
 ```
 
-As next, run `aspire run` from somewhere in the app and use `.http` file to test your CRUD endpoints. You should see the data being stored in the database and you can also see the logs and metrics on the dashboard.
+#### Running and Verifying
+Run the application:
+```shell
+aspire run
+```
+You should now be able to:
+- Create and retrieve data from SQL Server
+- Update and delete records via the API
+- Observe logs, traces, and metrics in the Aspire dashboard
+
 <img width="650px;" src="/006/ss-06.png">
 
 <!--  -->
