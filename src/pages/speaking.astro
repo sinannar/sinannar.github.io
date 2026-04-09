@@ -26,6 +26,24 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         <!-- Speaking Engagements -->
         <h2 style="font-size:1.5rem; margin-bottom:1rem;">Public Speakings</h2>
 
+        <ul class="talks-list">
+          <li>
+            <a
+              href="https://www.meetup.com/auckland-azure-usergroup/events/310859388"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="talk-card"
+            >
+              <div class="talk-image-frame">
+                <img
+                  src="/meetups/talks/event-flyer (3).jpg"
+                  alt="Forge Ahead with Azure AI Foundry, .Net Aspire & Azure Developer CLI event flyer"
+                />
+              </div>
+            </a>
+          </li>
+        </ul>
+
 
         <!-- Organiser Groups -->
         <h2 style="font-size:1.5rem; margin-bottom:1rem;">Organizer for</h2>
@@ -135,6 +153,54 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
     letter-spacing: 0.02em;
   }
 
+  .talks-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .talks-list li {
+    flex: 1 1 320px;
+    max-width: 400px;
+  }
+
+  .talk-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    text-decoration: none;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(183, 199, 247, 0.7);
+    box-shadow: 0 8px 24px rgba(38, 66, 156, 0.08);
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease;
+    background: #fff;
+  }
+
+  .talk-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(38, 66, 156, 0.14);
+  }
+
+  .talk-image-frame {
+    width: 100%;
+    overflow: hidden;
+    background: #0d1b2a;
+  }
+
+  .talk-image-frame img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+  }
+
   @media (max-width: 720px) {
     .group-list {
       gap: 1.5rem;
@@ -147,6 +213,10 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
     .group-pill img {
       max-width: 260px;
+    }
+
+    .talks-list {
+      gap: 1.5rem;
     }
   }
 </style>
