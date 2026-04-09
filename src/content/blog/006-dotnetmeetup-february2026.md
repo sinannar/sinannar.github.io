@@ -1,23 +1,48 @@
 ---
-title: 'Aspire @ .Net Meetup | February 2026'
-description: 'Aspire Hands on Demo'
+title: 'Hands-On with Aspire'
+description: 'A Practical Guide to .NET Aspire: From CLI to Full-Stack Integrations'
 pubDate: 'April 5 2026'
 heroImage: '/006-dotnetmeetup-february2026.jpg'
 ---
 
 ### Intro
-During [this](https://www.youtube.com/watch?v=iRWv_ExEzfI) one hour presentation at Auckland .Net User Group, I covered the following topics, which will be detailed here as a step-by-step guide with references used:
-1. Requirements
-2. Creating a new project using aspire cli
-3. Integrating Sql Server and writing CRUD for weathereforecast endpoints
-4. Integrating Angular instead of using Blazor
-5. Integrating Azure Functions to run background jobs
-6. Using GitHub Models to enhance data
+During a recent [Auckland .NET User Group session](https://www.youtube.com/watch?v=iRWv_ExEzfI), I ran a hands-on, one-hour demo exploring how to build a modern distributed application using .NET Aspire.
 
-Final code can be found at [github](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026) and I would recommend to reference the files whenever needed.
+Rather than focusing on theory, the session walked through a practical, end-to-end scenario—starting from project creation and progressively integrating real-world components like databases, frontend frameworks, background processing, and AI-powered enhancements.
 
-### Requirements
-To run this demo together, you will need dotnet sdk, aspire cli, func cli and angular cli with nodejs installed on your machine. These are easy to install and you can find the instructions on their official websites. Below you can see the versions of the tools I have used during the demo, which are mostly latest version other than the angular itself. 
+This blog post distills that session into a step-by-step guide so you can follow along and build the same solution yourself.
+
+We’ll cover:
+- Bootstrapping a new Aspire project using the CLI
+- Adding SQL Server and implementing CRUD APIs
+- Replacing Blazor with an Angular frontend
+- Running background jobs using Azure Functions
+- Enhancing data using GitHub Models
+
+If you prefer to jump straight into code, you can find the [complete solution on GitHub](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026), which I recommend referencing alongside this guide.
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+
+### Prerequisites
+
+To follow along with this demo, make sure you have the following installed:
+- .NET SDK
+- Aspire CLI
+- Azure Functions Core Tools (func CLI)
+- Node.js and Angular CLI
+
+All of these are straightforward to install—refer to their official documentation for setup instructions.
+
+Below are the versions used during the demo. Most are the latest available at the time, with the exception of Angular:
+
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % dotnet --list-sdks
 8.0.409 [/usr/local/share/dotnet/sdk]
@@ -37,10 +62,21 @@ sinannar@Sinans-MacBook-Pro BlogTemp % aspire --version
 sinannar@Sinans-MacBook-Pro BlogTemp % func version
 4.5.0
 ```
-<i>PS: It took ages to compile this blog post so there is new version of aspire, 13.2, which might appear on screenshots</i>
+<i>Note: While preparing this blog, a newer version of Aspire (13.2) was released. You may notice minor differences between the screenshots and your local setup.</i>
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Project Setup
-We are going to start using aspire cli to create a new project.
+Let’s start by creating a new Aspire project using the Aspire CLI:
+
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % aspire new
 
@@ -66,7 +102,11 @@ Do you want to create a test project?
 > No
   Yes
 ```
-Then navigate to the project folder and you will see the following structure, which is pretty much self explanatory. We have a solution file at the root and 4 projects for different purposes.
+
+For this demo, we’re using the Starter App (ASP.NET Core/Blazor) template as a baseline, which we’ll progressively evolve throughout the guide.
+
+#### Understanding the Project Structure
+Once the project is created, navigate into the folder, You’ll see a structure similar to the following:
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % cd AspireCrud
 sinannar@Sinans-MacBook-Pro AspireCrud % ls -alrt
@@ -80,8 +120,15 @@ drwxr-xr-x@  5 sinannar  staff   160 13 Feb 21:49 AspireCrud.ServiceDefaults
 drwxr-xr-x@  8 sinannar  staff   256 13 Feb 21:49 AspireCrud.AppHost
 sinannar@Sinans-MacBook-Pro AspireCrud %
 ```
+At a high level:
+- AppHost → Orchestrates and wires up your distributed application
+- ApiService → Backend API layer
+- Web → Frontend application (initially Blazor)
+- ServiceDefaults → Shared configuration (logging, resilience, etc.)
+This structure is one of Aspire’s strengths—it gives you a clean separation of concerns out of the box.
 
-Before we go further, I want to change current solution file to `slnx`
+#### Switching to .slnx
+Before continuing, I prefer switching the solution file format to `.slnx`:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % rm AspireCrud.sln
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet new sln -f slnx
@@ -95,7 +142,10 @@ Project `AspireCrud.Web/AspireCrud.Web.csproj` added to the solution.
 Solution /Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.slnx already contains project AspireCrud.ServiceDefaults/AspireCrud.ServiceDefaults.csproj.
 Solution /Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.slnx already contains project AspireCrud.Web/AspireCrud.Web.csproj.
 ```
-Lets create gitignore file and initialize a git repository.
+This keeps the solution file more lightweight and consistent with newer tooling.
+
+#### Initializing Git
+Finally, let’s initialise version control:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet new gitignore
 The template "dotnet gitignore file" was created successfully.
@@ -106,9 +156,11 @@ Initialized empty Git repository in /Users/sinannar/source/BlogTemp/AspireCrud/.
 sinannar@Sinans-MacBook-Pro AspireCrud % git add .
 sinannar@Sinans-MacBook-Pro AspireCrud % git commit -m "init"
 ```
+At this point, we have a clean Aspire project ready to evolve.
 
 #### Running the application
-Lets go and run the aspire application to see if everything is working fine. We can run the application from the root of the solution and it will automatically find the AppHost project and run it.
+Before making any changes, let’s run the application to make sure everything is working as expected.
+From the root of the solution, simply run `aspire run`:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -130,17 +182,37 @@ AspireCrud.AppHost/AspireCrud.AppHost.csproj
 
                Press CTRL+C to stop the apphost and exit.
 ```
-Clicking the url will open aspire dashboard on a browser and you can see the apphost is running and we have 2 services running as well, which are `apiservice` and `webfrontend`. These are the default services created by aspire cli and they are running with the default configuration. We will be modifying these services and adding new ones in the next steps.
+Aspire will automatically detect the AppHost project and start the entire application:
+
+##### Exploring the Aspire Dashboard
+
+Once the app is running, open the dashboard URL in your browser. You’ll see that Aspire has already started two services:
+- apiservice
+- webfrontend
+
+These are the default services created by the template, running with minimal configuration. We’ll extend and customise them in the next steps.
 <img width="650px;" src="/006/ss-01.png">
 
-There is graph view for the resources on dashboard, it can be quite useful when your project grows and you have multiple services and resources. You can easily see the dependencies between them and how they are connected. You can also click on each resource to see more details about it, such as the connection strings, environment variables, logs, etc.
+##### Visualising Your Architecture
+One of the most useful features of Aspire is the `graph view`, which shows how your services and resources are connected. As your application grows, this becomes incredibly valuable—you can quickly understand dependencies and interactions across your system.
 <img width="650px;" src="/006/ss-02.png">
 
+##### Centralised Logs and Built-in Observability
 You can see the logs of each service on the dashboard as well, which is pretty useful for debugging and monitoring. This is not limited to your own services, but also includes the logs of the containers you are running as part of your infrastructure, such as sql server, redis, etc. You can see the logs of these containers and services in the same place, which is pretty convenient.
 <img width="650px;" src="/006/ss-03.png">
 
 Aspire gives you ability to view traces and metrics locally without setting up any external monitoring tools. You can see the traces and metrics of your services on the dashboard, which is pretty useful for debugging and performance monitoring. 
 <img width="650px;" src="/006/ss-04.png">
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Sql Servere and CRUD
 Lets start with integrating Sql Server to our application and writing some CRUD operations for the weatherforecast endpoints. We will be using `Aspire.Hosting.SqlServer` package to register a sql server resource in our apphost and then we will use `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package to write the data access code in our apiservice. Lets do those step by step.
@@ -354,6 +426,17 @@ Content-Type: application/json
 
 As next, run `aspire run` from somewhere in the app and use `.http` file to test your CRUD endpoints. You should see the data being stored in the database and you can also see the logs and metrics on the dashboard.
 <img width="650px;" src="/006/ss-06.png">
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+
 
 ### Javascript Integration
 Up until now, we have introduced sqlserver and implement a real CRUD operations for our weatherforecast entity, but we are still using the default Blazor frontend created by aspire cli, which is not bad at all, but I want to show you how you can easily replace it with an Angular frontend and consume the same endpoints we created in the api service.
@@ -1237,6 +1320,15 @@ When you run `aspire run` and navigate to `http://localhost:4200`, you should se
 You can edit an item, create a batch of them, and delete them as well. All operations should be working seamlessly and you should see the changes in the UI immediately after performing any action. This is the power of having a distributed application with a well-defined API and a decoupled frontend.
 <img width="650px;" src="/006/ss-10.png">
 
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Azure Function Integration
 #### Creating Azure Function Project and Integration with Aspire
@@ -1468,6 +1560,16 @@ With all the code is put in place, we should see function working on our traces 
 What does this function do is that fix the summary of weather forecast that was randomised before
 <img width="650px;" src="/006/ss-15.png">
 <img width="650px;" src="/006/ss-16.png">
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Github Models Integration
 With Github Models, we can put a better description for our weather forecast. We are going to work on it now in this section. 
