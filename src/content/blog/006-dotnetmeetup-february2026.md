@@ -1420,7 +1420,7 @@ With those changes in place, run the application again using `aspire run`, then 
 You can also edit existing items, generate a batch of forecasts, and remove records as needed.
 <img width="650px;" src="/006/ss-10.png">
 
-At this point, the application demonstrates one of the key strengths of this approach: a decoupled frontend working seamlessly with a well-defined backend API, all orchestrated through Aspire.
+At this point, the application demonstrates one of the key strengths of this approach: `a decoupled frontend` working seamlessly with a `well-defined backend API`, all orchestrated through Aspire.
 
 <!--  -->
 <!--  -->
