@@ -1717,17 +1717,32 @@ The function is effectively enriching your data in the background:
 <!--  -->
 
 ### Github Models Integration
-With Github Models, we can put a better description for our weather forecast. We are going to work on it now in this section. 
+So far, our function standardises weather summaries. Now we’ll take it a step further by using GitHub Models to generate richer, human-friendly descriptions for each forecast.
 
-#### Dependencies and Setup
-We are going to run the following commands to install dependencies and set up our application to use github models.
+#### Adding Dependencies
+Start by installing the required packages:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add github-models
 ✔  The package Aspire.Hosting.GitHub.Models::13.1.1 was added successfully.
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet add ./AspireCrud.Function/AspireCrud_Function.csproj package Aspire.Azure.AI.Inference --version 13.1.0-preview.1.25616.3
 ```
 
-We will adapt our app host to use github models, `AppHost.cs` should look like below:
+#### Registering the Model in AppHost
+Update AppHost.cs to include a GitHub model:
+```csharp
+using Aspire.Hosting.GitHub;
+
+var model = GitHubModel.OpenAI.OpenAIGpt4o;
+var chat = builder.AddGitHubModel("chat", model);
+```
+Then wire it into the function:
+```csharp
+var function = builder.AddAzureFunctionsProject<Projects.AspireCrud_Function>("function")
+    .WithReference(apiService).WaitFor(apiService)
+    .WithReference(chat).WaitFor(chat)
+    .WithHostStorage(storage);
+```
+This makes the model available to the function via Aspire’s service wiring. Final `AppHost.cs` should look like below:
 ```csharp
 using Aspire.Hosting.GitHub;
 
@@ -1761,7 +1776,8 @@ var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName:
 builder.Build().Run();
 ```
 
-We are going to create a new service that will use the chat client to get description for our weather forecasts and we will call this service from our function to update the description of our forecasts. Below is the code for the service that uses chat client to get description for weather forecasts.
+#### Creating a Description Service
+Next, create a service that uses the model to generate descriptions:
 ```csharp
 public interface IForecastDescriber
 {
@@ -1787,14 +1803,16 @@ public class ForecastDescriber(IChatClient chatClient, ILoggerFactory loggerFact
     }
 }
 ```
-
-We are going to register `IForecastDescriber` as well as `IChatClient` to our dependency injection container in `Program.cs` file in Function App as below:
+#### Registering the Description Service
+In Program.cs of the function app:
 ```csharp
 builder.AddAzureChatCompletionsClient("chat").AddChatClient();
 builder.Services.AddScoped<IForecastDescriber, ForecastDescriber>();
 ```
 
-Now we can update our `WeatherSummaryEnricher` function to use `IForecastDescriber` to get description for our forecasts and update them in the database. Below is the updated code for `WeatherSummaryEnricher` function. Insert the code below, just after `forecast.Summary = correctSummary;` line in the function
+#### Enhancing the Function
+Now update the function to enrich forecasts with AI-generated descriptions.
+After setting the summary, add:
 ```csharp
 if(string.IsNullOrWhiteSpace(forecast.Description) && enrichmentCount < 2)
 {
@@ -1804,31 +1822,51 @@ if(string.IsNullOrWhiteSpace(forecast.Description) && enrichmentCount < 2)
     ++enrichmentCount;
 }
 ```
-To make this work, do not forget to inject `IForecastDescriber` to the function as well, constructor of the function should look like below:
+
+And update the constructor:
 ```csharp
 public class WeatherSummaryEnricher(ILoggerFactory loggerFactory
     , WeatherForecastClient weatherClient
     , IForecastDescriber describer)
 ```
-You may realize I am using `enrichmentCount` variable to limit the number of calls to describer in order to stay within the token limits of the model. This is just for demonstration purposes, you can implement a more robust solution for this in production scenarios. Just do not forget to initalize `enrichmentCount` variable in the function. When you run the app with `aspire run` you may see the `unresolved parameter` error shown as below
-<img width="650px;" src="/006/ss-17.png">
+The enrichmentCount is used here to limit model calls and avoid excessive token usage during the demo.
 
-#### Github Token for Github Models
-Navigate to your github, and from top right corner, click your profile to navigate to `Settings`. Then from left menu, click `Developer settings` at the bottom, and then click `Personal access tokens`, choose `Fine-grained tokens`. Click `Generate new token` button to generate a new token. Repository access need to be `Public Repositories` and from permission, search for `Models` and select it. Provide a name and description, as well as an expiration date, then  generate the token. Copy the generated token, we will need it for our next step.
+#### Configuring GitHub Access
+To use GitHub Models, you’ll need a personal access token:
 
-On aspire dashboard, click `enter value` for the error, and provide the value you copied.
+1. Go to GitHub → Settings → Developer settings
+2. Create a fine-grained token
+3. Grant access to:
+   - Public repositories
+   - Models permission
+4. Copy the token
+
+In the Aspire dashboard, provide the token when prompted:
 <img width="650px;" src="/006/ss-18.png">
 
-Now when the function is triggerred, we can see it at the traces as shown below
+#### Observing AI in Action
+Once the application is running, the function will:
+- Fetch forecasts from the API
+- Generate descriptions using the model
+- Update the database
+
 <img width="650px;" src="/006/ss-19.png">
 
-When we deep dive into the trace, we see this spesific icon for `GenAI` details
-<img width="650px;" src="/006/ss-20.png">
+Aspire also provides GenAI tracing, allowing you to inspect:
+- Prompts sent to the model
+- Responses returned
+- Token usage and execution details
 
-If we click this `GenAI` icon, we can see the details for the model call, including the prompt we sent to the model, and the response we got back from the model. This is very useful for debugging and understanding how our application is interacting with the model.
+<img width="650px;" src="/006/ss-20.png">
 <img width="650px;" src="/006/ss-21.png">
 
-With this way, our function is calling our API to enrich the weather forecasts with better descriptions generated by the model. This is a powerful way to enhance our application with AI capabilities without having to manage the infrastructure for it, thanks to Github Models and Aspire.
+#### What This Enables
+At this point, your application:
+- Generates data via the API
+- Processes it in the background using Functions
+- Enriches it using AI models
+- Surfaces everything through a frontend
+
 <img width="650px;" src="/006/ss-22.png">
 
 ### References
@@ -1845,5 +1883,5 @@ With this way, our function is calling our API to enrich the weather forecasts w
 - [Azure Function | .NET Aspire Integration](https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-aspire-integration)
 - [Tech Comm | Github Model Catalog](https://techcommunity.microsoft.com/blog/educatordeveloperblog/github-model-catalog---getting-started/4212711)
 - [Github Models](https://github.com/marketplace?type=models)
-- [Code](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026)
-- [Video](https://www.youtube.com/watch?v=iRWv_ExEzfI)
+- [Final Code](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026)
+- [Live Demo Video](https://www.youtube.com/watch?v=iRWv_ExEzfI)
