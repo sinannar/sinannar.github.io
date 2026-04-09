@@ -31,6 +31,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
         <h2 style="font-size:1.5rem; margin-bottom:1rem;">Public Speakings</h2>
 
         <ul class="talks-list">
+
           <li class="talk-flip-wrapper">
             <div class="talk-flip-inner">
               <!-- Front: event flyer -->
@@ -58,7 +59,123 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
               </div>
             </div>
           </li>
+
+          <li class="talk-flip-wrapper">
+            <div class="talk-flip-inner">
+              <!-- Front: event flyer -->
+              <div class="talk-face talk-front">
+                <img
+                  src="/meetups/talks/event-flyer (3).jpg"
+                  alt="Forge Ahead with Azure AI Foundry, .Net Aspire & Azure Developer CLI event flyer"
+                />
+              </div>
+              <!-- Back: info + link -->
+              <div class="talk-face talk-back">
+                <span class="talk-event">Aotearoa Azure Meetup</span>
+                <h3 class="talk-title">.NET Aspire and Azure Developer CLI</h3>
+                <p class="talk-desc">Join us for a fast-paced session where we&rsquo;ll explore how .NET Aspire simplifies building cloud-ready apps and how the Azure Developer CLI (azd) makes it easy to deploy them to Azure. In this session, you&rsquo;ll see a live demo showing how these tools work together to take an app from your local machine to the cloud with minimal effort.</p>
+                <div class="talk-details">
+                  <span class="talk-date">Sep 18, 2025</span>
+                  <span class="talk-location">Microsoft NZ, Auckland</span>
+                </div>
+                <a
+                  href="https://www.meetup.com/auckland-azure-usergroup/events/310859388"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="talk-link"
+                >View Event &rarr;</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="talk-flip-wrapper">
+            <div class="talk-flip-inner">
+              <!-- Front: event flyer -->
+              <div class="talk-face talk-front">
+                <img
+                  src="/meetups/talks/event-flyer (3).jpg"
+                  alt="Forge Ahead with Azure AI Foundry, .Net Aspire & Azure Developer CLI event flyer"
+                />
+              </div>
+              <!-- Back: info + link -->
+              <div class="talk-face talk-back">
+                <span class="talk-event">Aotearoa Azure Meetup</span>
+                <h3 class="talk-title">.NET Aspire and Azure Developer CLI</h3>
+                <p class="talk-desc">Join us for a fast-paced session where we&rsquo;ll explore how .NET Aspire simplifies building cloud-ready apps and how the Azure Developer CLI (azd) makes it easy to deploy them to Azure. In this session, you&rsquo;ll see a live demo showing how these tools work together to take an app from your local machine to the cloud with minimal effort.</p>
+                <div class="talk-details">
+                  <span class="talk-date">Sep 18, 2025</span>
+                  <span class="talk-location">Microsoft NZ, Auckland</span>
+                </div>
+                <a
+                  href="https://www.meetup.com/auckland-azure-usergroup/events/310859388"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="talk-link"
+                >View Event &rarr;</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="talk-flip-wrapper">
+            <div class="talk-flip-inner">
+              <!-- Front: event flyer -->
+              <div class="talk-face talk-front">
+                <img
+                  src="/meetups/talks/event-flyer (3).jpg"
+                  alt="Forge Ahead with Azure AI Foundry, .Net Aspire & Azure Developer CLI event flyer"
+                />
+              </div>
+              <!-- Back: info + link -->
+              <div class="talk-face talk-back">
+                <span class="talk-event">Aotearoa Azure Meetup</span>
+                <h3 class="talk-title">.NET Aspire and Azure Developer CLI</h3>
+                <p class="talk-desc">Join us for a fast-paced session where we&rsquo;ll explore how .NET Aspire simplifies building cloud-ready apps and how the Azure Developer CLI (azd) makes it easy to deploy them to Azure. In this session, you&rsquo;ll see a live demo showing how these tools work together to take an app from your local machine to the cloud with minimal effort.</p>
+                <div class="talk-details">
+                  <span class="talk-date">Sep 18, 2025</span>
+                  <span class="talk-location">Microsoft NZ, Auckland</span>
+                </div>
+                <a
+                  href="https://www.meetup.com/auckland-azure-usergroup/events/310859388"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="talk-link"
+                >View Event &rarr;</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="talk-flip-wrapper">
+            <div class="talk-flip-inner">
+              <!-- Front: event flyer -->
+              <div class="talk-face talk-front">
+                <img
+                  src="/meetups/talks/event-flyer (3).jpg"
+                  alt="Forge Ahead with Azure AI Foundry, .Net Aspire & Azure Developer CLI event flyer"
+                />
+              </div>
+              <!-- Back: info + link -->
+              <div class="talk-face talk-back">
+                <span class="talk-event">Aotearoa Azure Meetup</span>
+                <h3 class="talk-title">.NET Aspire and Azure Developer CLI</h3>
+                <p class="talk-desc">Join us for a fast-paced session where we&rsquo;ll explore how .NET Aspire simplifies building cloud-ready apps and how the Azure Developer CLI (azd) makes it easy to deploy them to Azure. In this session, you&rsquo;ll see a live demo showing how these tools work together to take an app from your local machine to the cloud with minimal effort.</p>
+                <div class="talk-details">
+                  <span class="talk-date">Sep 18, 2025</span>
+                  <span class="talk-location">Microsoft NZ, Auckland</span>
+                </div>
+                <a
+                  href="https://www.meetup.com/auckland-azure-usergroup/events/310859388"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="talk-link"
+                >View Event &rarr;</a>
+              </div>
+            </div>
+          </li>
+
         </ul>
+
+
+        
 
 
         <!-- Organiser Groups -->
@@ -183,16 +300,15 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
   .talks-list {
     list-style: none;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2rem;
     margin-bottom: 2.5rem;
   }
 
   /* ── Flip card ── */
   .talk-flip-wrapper {
-    flex: 1 1 200px;
-    max-width: 240px;
+    width: 100%;
     perspective: 900px;
   }
 
@@ -320,7 +436,14 @@ import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
     }
 
     .talks-list {
+      grid-template-columns: 1fr;
       gap: 1.5rem;
+    }
+  }
+
+  @media (max-width: 1024px) and (min-width: 721px) {
+    .talks-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>
