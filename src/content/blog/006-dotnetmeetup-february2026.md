@@ -1,23 +1,48 @@
 ---
-title: 'Aspire @ .Net Meetup | February 2026'
-description: 'Aspire Hands on Demo'
+title: 'Hands-On with Aspire'
+description: 'A Practical Guide to .NET Aspire: From CLI to Full-Stack Integrations'
 pubDate: 'April 5 2026'
 heroImage: '/006-dotnetmeetup-february2026.jpg'
 ---
 
 ### Intro
-During [this](https://www.youtube.com/watch?v=iRWv_ExEzfI) one hour presentation at Auckland .Net User Group, I covered the following topics, which will be detailed here as a step-by-step guide with references used:
-1. Requirements
-2. Creating a new project using aspire cli
-3. Integrating Sql Server and writing CRUD for weathereforecast endpoints
-4. Integrating Angular instead of using Blazor
-5. Integrating Azure Functions to run background jobs
-6. Using GitHub Models to enhance data
+During a recent [Auckland .NET User Group session](https://www.youtube.com/watch?v=iRWv_ExEzfI), I ran a hands-on, one-hour demo exploring how to build a modern distributed application using .NET Aspire.
 
-Final code can be found at [github](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026) and I would recommend to reference the files whenever needed.
+Rather than focusing on theory, the session walked through a practical, end-to-end scenario—starting from project creation and progressively integrating real-world components like databases, frontend frameworks, background processing, and AI-powered enhancements.
 
-### Requirements
-To run this demo together, you will need dotnet sdk, aspire cli, func cli and angular cli with nodejs installed on your machine. These are easy to install and you can find the instructions on their official websites. Below you can see the versions of the tools I have used during the demo, which are mostly latest version other than the angular itself. 
+This blog post distills that session into a step-by-step guide so you can follow along and build the same solution yourself.
+
+We’ll cover:
+- Bootstrapping a new Aspire project using the CLI
+- Adding SQL Server and implementing CRUD APIs
+- Replacing Blazor with an Angular frontend
+- Running background jobs using Azure Functions
+- Enhancing data using GitHub Models
+
+If you prefer to jump straight into code, you can find the [complete solution on GitHub](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026), which I recommend referencing alongside this guide.
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+
+### Prerequisites
+
+To follow along with this demo, make sure you have the following installed:
+- .NET SDK
+- Aspire CLI
+- Azure Functions Core Tools (func CLI)
+- Node.js and Angular CLI
+
+All of these are straightforward to install—refer to their official documentation for setup instructions.
+
+Below are the versions used during the demo. Most are the latest available at the time, with the exception of Angular:
+
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % dotnet --list-sdks
 8.0.409 [/usr/local/share/dotnet/sdk]
@@ -37,10 +62,21 @@ sinannar@Sinans-MacBook-Pro BlogTemp % aspire --version
 sinannar@Sinans-MacBook-Pro BlogTemp % func version
 4.5.0
 ```
-<i>PS: It took ages to compile this blog post so there is new version of aspire, 13.2, which might appear on screenshots</i>
+<i>Note: While preparing this blog, a newer version of Aspire (13.2) was released. You may notice minor differences between the screenshots and your local setup.</i>
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Project Setup
-We are going to start using aspire cli to create a new project.
+Let’s start by creating a new Aspire project using the Aspire CLI:
+
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % aspire new
 
@@ -66,7 +102,11 @@ Do you want to create a test project?
 > No
   Yes
 ```
-Then navigate to the project folder and you will see the following structure, which is pretty much self explanatory. We have a solution file at the root and 4 projects for different purposes.
+
+For this demo, we’re using the Starter App (ASP.NET Core/Blazor) template as a baseline, which we’ll progressively evolve throughout the guide.
+
+#### Understanding the Project Structure
+Once the project is created, navigate into the folder, You’ll see a structure similar to the following:
 ```shell
 sinannar@Sinans-MacBook-Pro BlogTemp % cd AspireCrud
 sinannar@Sinans-MacBook-Pro AspireCrud % ls -alrt
@@ -80,8 +120,15 @@ drwxr-xr-x@  5 sinannar  staff   160 13 Feb 21:49 AspireCrud.ServiceDefaults
 drwxr-xr-x@  8 sinannar  staff   256 13 Feb 21:49 AspireCrud.AppHost
 sinannar@Sinans-MacBook-Pro AspireCrud %
 ```
+At a high level:
+- AppHost → Orchestrates and wires up your distributed application
+- ApiService → Backend API layer
+- Web → Frontend application (initially Blazor)
+- ServiceDefaults → Shared configuration (logging, resilience, etc.)
+This structure is one of Aspire’s strengths—it gives you a clean separation of concerns out of the box.
 
-Before we go further, I want to change current solution file to `slnx`
+#### Switching to .slnx
+Before continuing, I prefer switching the solution file format to `.slnx`:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % rm AspireCrud.sln
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet new sln -f slnx
@@ -95,7 +142,10 @@ Project `AspireCrud.Web/AspireCrud.Web.csproj` added to the solution.
 Solution /Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.slnx already contains project AspireCrud.ServiceDefaults/AspireCrud.ServiceDefaults.csproj.
 Solution /Users/sinannar/source/BlogTemp/AspireCrud/AspireCrud.slnx already contains project AspireCrud.Web/AspireCrud.Web.csproj.
 ```
-Lets create gitignore file and initialize a git repository.
+This keeps the solution file more lightweight and consistent with newer tooling.
+
+#### Initializing Git
+Finally, let’s initialise version control:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet new gitignore
 The template "dotnet gitignore file" was created successfully.
@@ -106,9 +156,11 @@ Initialized empty Git repository in /Users/sinannar/source/BlogTemp/AspireCrud/.
 sinannar@Sinans-MacBook-Pro AspireCrud % git add .
 sinannar@Sinans-MacBook-Pro AspireCrud % git commit -m "init"
 ```
+At this point, we have a clean Aspire project ready to evolve.
 
 #### Running the application
-Lets go and run the aspire application to see if everything is working fine. We can run the application from the root of the solution and it will automatically find the AppHost project and run it.
+Before making any changes, let’s run the application to make sure everything is working as expected.
+From the root of the solution, simply run `aspire run`:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -130,20 +182,45 @@ AspireCrud.AppHost/AspireCrud.AppHost.csproj
 
                Press CTRL+C to stop the apphost and exit.
 ```
-Clicking the url will open aspire dashboard on a browser and you can see the apphost is running and we have 2 services running as well, which are `apiservice` and `webfrontend`. These are the default services created by aspire cli and they are running with the default configuration. We will be modifying these services and adding new ones in the next steps.
+Aspire will automatically detect the AppHost project and start the entire application:
+
+#### Exploring the Aspire Dashboard
+
+Once the app is running, open the dashboard URL in your browser. You’ll see that Aspire has already started two services:
+- apiservice
+- webfrontend
+
+These are the default services created by the template, running with minimal configuration. We’ll extend and customise them in the next steps.
 <img width="650px;" src="/006/ss-01.png">
 
-There is graph view for the resources on dashboard, it can be quite useful when your project grows and you have multiple services and resources. You can easily see the dependencies between them and how they are connected. You can also click on each resource to see more details about it, such as the connection strings, environment variables, logs, etc.
+#### Visualising Your Architecture
+One of the most useful features of Aspire is the `graph view`, which shows how your services and resources are connected. As your application grows, this becomes incredibly valuable—you can quickly understand dependencies and interactions across your system.
 <img width="650px;" src="/006/ss-02.png">
 
+#### Centralised Logs and Built-in Observability
 You can see the logs of each service on the dashboard as well, which is pretty useful for debugging and monitoring. This is not limited to your own services, but also includes the logs of the containers you are running as part of your infrastructure, such as sql server, redis, etc. You can see the logs of these containers and services in the same place, which is pretty convenient.
 <img width="650px;" src="/006/ss-03.png">
 
 Aspire gives you ability to view traces and metrics locally without setting up any external monitoring tools. You can see the traces and metrics of your services on the dashboard, which is pretty useful for debugging and performance monitoring. 
 <img width="650px;" src="/006/ss-04.png">
 
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+
 ### Sql Servere and CRUD
-Lets start with integrating Sql Server to our application and writing some CRUD operations for the weatherforecast endpoints. We will be using `Aspire.Hosting.SqlServer` package to register a sql server resource in our apphost and then we will use `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package to write the data access code in our apiservice. Lets do those step by step.
+Now let’s extend the application by integrating SQL Server and implementing CRUD operations for the WeatherForecast endpoints. To do that, we’ll use two packages:
+- `Aspire.Hosting.SqlServer` to register SQL Server as a resource in the AppHost
+- `Aspire.Microsoft.EntityFrameworkCore.SqlServer` to integrate Entity Framework Core into the API service
+- `Microsoft.EntityFrameworkCore.Design` to enable migrations and design-time features for Entity Framework Core
+
+Let’s start by adding the required packages:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -156,19 +233,24 @@ sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % dotnet add package Microsoft
 ```
 
 #### Using SQL Server in AppHost
-Now we need to register the sql server resource in our apphost and also we need to configure the connection string for it. We can do this by adding the following code to our apphost code.
+Next, we need to register SQL Server in the AppHost and create a database resource that our API service can use. Add the following code to the AppHost:
 ```csharp
 var sql = builder.AddSqlServer("sql");
 var sqldb = sql.AddDatabase("sqldb");
 ```
-With this sql and sqldb resource registered, we can now use it in our services by referencing it in the service configuration. We will be doing this in the next step when we configure our apiservice to use the sql server resource.
+This registers a SQL Server resource named sql and a database named sqldb.
+
+Once the database resource is available, we can reference it from other services. In this case, we’ll wire it into the API service configuration:
 ```csharp
 var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice")
     .WithReference(sqldb).WaitFor(sqldb)
     .WithHttpHealthCheck("/health");
 ```
 
-#### Replacing the WeatherForecast model
+With that in place, Aspire can automatically make the database connection available to the API service. In the next step, we’ll configure the API project to use this database through Entity Framework Core.
+
+#### Replacing the `WeatherForecast` model
+The default template includes a simple WeatherForecast record in Program.cs:
 ```csharp
 // Find the WeatherForecast record in Program.cs in ApiService project
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
@@ -176,6 +258,7 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 ```
+To support persistence with Entity Framework Core, we need to replace this with a proper entity class that includes an Id property and can be mapped to a database table:
 ```csharp
 // Replace it with the following code and move it to a new file called WeatherForecast.cs in the same project
 public class WeatherForecast
@@ -190,8 +273,11 @@ public class WeatherForecast
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
 ```
-This change will break the existing `app.MapGet("/weatherforecast"` endpoint because it is using the old record type, so we need to modify it to use the new class type and also we need to change the implementation to return data from the database instead of returning hardcoded data. We will be using Entity Framework Core to access the database and we will be using the DbContext class to manage the database connection and operations. For now, you can comment out the existing implementation of the endpoint and we will come back to it later after we set up the database and the DbContext. 
-```csharp// Comment out the existing implementation of the endpoint in Program.cs in ApiService project
+This change introduces an Id property for database storage and a Description field so we can enrich the model later.
+
+Because the existing GET /weatherforecast endpoint still relies on the original record and returns hard-coded data, it will no longer fit our updated model. For now, comment it out and we’ll replace it once the database and DbContext are in place.
+```csharp
+// Comment out the existing implementation of the endpoint in Program.cs in ApiService project
 // app.MapGet("/weatherforecast", () =>
 // {
 //    ...
@@ -199,8 +285,16 @@ This change will break the existing `app.MapGet("/weatherforecast"` endpoint bec
 // .WithName("GetWeatherForecast");
 ```
 
-#### Adding DbContext and Repository
-Best practice is creating classes in their own files, but for the sake of the demo, I will be appending the code to the Program.cs file. You can refactor it later if you want. You may want to add `using Microsoft.EntityFrameworkCore;` at the top of the file.
+#### Adding DbContext
+To work with the database, we need to introduce a DbContext.
+
+While it’s best practice to place classes in separate files, for the sake of this demo we’ll keep everything in Program.cs. You can refactor this later if needed.
+
+Make sure you have the following using statement:
+```csharp
+using Microsoft.EntityFrameworkCore;
+```
+Then add the DbContext:
 ```csharp
 // Add the following DbContext class to the same project, you can name it AppDbContext.cs
 public class AppDbContext(DbContextOptions<AppDbContext> options)
@@ -210,24 +304,36 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 }
 ```
 
-#### Configuring the services
-Now we need to configure the services in our apphost to use the sql server resource we registered and also to use the DbContext we created.  
+#### Configuring the Database (Aspire Way)
+Next, we need to configure the API service to use the SQL Server resource we registered earlier.  
 ```csharp
 builder.AddSqlServerDbContext<AppDbContext>("sqldb");
 ```
-One important thing here is to note that we are using the `builder.AddSqlServerDbContext` instead of `builder.Services.AddDbContext` because we want to use the best practices implemented in `Aspire.Microsoft.EntityFrameworkCore.SqlServer` package, which will automatically wire up the connection string from the apphost configuration and also it will add some diagnostic enrichment for our DbContext.
+Instead of using the traditional `builder.Services.AddDbContext`, Aspire provides `AddSqlServerDbContext`, which:
+- Automatically resolves the connection string from AppHost
+- Integrates with Aspire’s service discovery
+- Adds diagnostic and telemetry enrichment out of the box
 
-I want to put a focus on `"sqldb"` name we are using here, which is the name of database resource we registered in the apphost and now it became availablee for us to use in the api service. 
+The `"sqldb"` name is important—it matches the database resource we defined in the AppHost and is how Aspire wires everything together.
 <img width="950px;" src="/006/ss-05.png">
 
-This is how the service discovery works in aspire, and if you dig deep into `builder.AddServiceDefaults();` line in the api service configuration, you will see that is actually coming from ServiceDefaults project which has only one `Extensions.cs` file that registers the followings by default:
+#### Behind the Scenes: Service Defaults
+A lot of this “magic” comes from the default configuration added via:
+```csharp
+builder.AddServiceDefaults();
+```
+This pulls in shared setup from the ServiceDefaults project, which includes:
 - Open Telemetry
 - Default Health Checks
 - Service Discovery
 - Http Client Defaults (eg. Service discovery for http clients, retry policies, etc.)
 
+This is one of the key benefits of Aspire—it standardises these concerns so you don’t have to configure them manually for every service.
+
 #### Creating Migrations and Updating the Database
-Before we go and create a migration, I want to add this code piece between `app.MapDefaultEndpoints();` and `app.Run();` to api service so that when the application starts, it automatically run migrations and update the databasep, and insert some random data to test read endpoints.
+Before creating a migration, let’s add a small piece of code to automatically apply migrations and seed some data when the application starts.
+
+Place the following between `app.MapDefaultEndpoints();` and `app.Run();` in the API service:
 ```csharp
 using (var scope = app.Services.CreateScope())
 {
@@ -248,7 +354,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 ```
-Now we are ready to create migrations, lets navigate to ApiService project and create a migration using the following command.
+This ensures that:
+- The database schema is automatically updated on startup
+- Some sample data is inserted for testing the read endpoints
+
+#### Creating the Migration
+Now we’re ready to create our first migration. Navigate to the ApiService project and run:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 /Users/sinannar/source/BlogTemp/AspireCrud
@@ -264,9 +375,12 @@ sinannar@Sinans-MacBook-Pro AspireCrud.ApiService % ls Migrations
 AppDbContextModelSnapshot.cs
 sinannar@Sinans-MacBook-Pro AspireCrud.ApiService %
 ```
+A new Migrations folder will be created containing the generated migration files.
 
-#### Update the endpoints for CRUD
-Now we can replace that commented api, `GetWeatherForecast`, with the followings to have the full CRUD operations for our WeatherForecast entity. We will be using the DbContext to access the database and perform the operations.
+#### Implementing CRUD Endpoints
+Now we can replace the previously commented GET /weatherforecast endpoint with a full set of CRUD operations backed by the database.
+
+These endpoints use AppDbContext to interact with SQL Server:
 ```csharp
 app.MapGet("/weatherforecast", async (AppDbContext db) =>
 {
@@ -320,7 +434,13 @@ app.MapPost("/weatherforecast/batch", async (AppDbContext db) =>
     return Results.Created("/weatherforecast/batch", forecasts);
 });
 ```
-Before we go further, there is `.http` file in your api project and if you replace the content with the following code, you can easily test your endpoints using the `Rest Client` extension in VS Code. You can also use Postman or any other API testing tool if you prefer. Just keep the `@ApiService_HostAddress` at the top and replace all lines after that with the following code to have the requests for all the endpoints we created.
+At this point, the API is fully wired to the database and supports standard create, read, update, and delete operations.
+
+#### Testing the Endpoints
+You can quickly test these endpoints using the .http file included in the API project.
+
+If you’re using VS Code, the REST Client extension makes this especially convenient. Alternatively, you can use tools like Postman or curl.
+
 ```http
 GET {{ApiService_HostAddress}}/weatherforecast/
 Accept: application/json
@@ -352,14 +472,36 @@ Content-Type: application/json
 ###
 ```
 
-As next, run `aspire run` from somewhere in the app and use `.http` file to test your CRUD endpoints. You should see the data being stored in the database and you can also see the logs and metrics on the dashboard.
+#### Running and Verifying
+Run the application:
+```shell
+aspire run
+```
+You should now be able to:
+- Create and retrieve data from SQL Server
+- Update and delete records via the API
+- Observe logs, traces, and metrics in the Aspire dashboard
+
 <img width="650px;" src="/006/ss-06.png">
 
-### Javascript Integration
-Up until now, we have introduced sqlserver and implement a real CRUD operations for our weatherforecast entity, but we are still using the default Blazor frontend created by aspire cli, which is not bad at all, but I want to show you how you can easily replace it with an Angular frontend and consume the same endpoints we created in the api service.
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
-#### Removing Blazor
-Remove the Blazor FE by running the following commands
+
+### Replacing Blazor with Angular
+So far, we’ve built a backend powered by SQL Server with fully functional CRUD endpoints. However, the application is still using the default Blazor frontend generated by the Aspire template.
+
+While Blazor works well, in many real-world scenarios you may want to integrate with an existing JavaScript framework. In this section, we’ll replace the frontend with an Angular application and connect it to the same API.
+
+#### Removing the Blazor Frontend
+First, remove the existing Blazor project from the solution:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % pwd
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference remove AspireCrud.Web/AspireCrud.Web.csproj --project AspireCrud.AppHost/AspireCrud.AppHost.csproj                                                                                            
@@ -370,7 +512,7 @@ Project `AspireCrud.Web/AspireCrud.Web.csproj` removed from the solution.
 sinannar@Sinans-MacBook-Pro AspireCrud % rm -rf AspireCrud.Web
 ```
 
-Then remove the following code from `AppHost.cs` file to remove the web frontend service configuration.
+Next, remove the frontend configuration from `AppHost.cs`:
 ```csharp
 builder.AddProject<Projects.AspireCrud_Web>("webfrontend")
     .WithExternalHttpEndpoints()
@@ -379,7 +521,7 @@ builder.AddProject<Projects.AspireCrud_Web>("webfrontend")
     .WaitFor(apiService);
 ```
 
-Remaining of `AppHost.cs` file should look like this after the change:
+After this change, your `AppHost.cs` should look like:
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -393,8 +535,8 @@ var apiService = builder.AddProject<Projects.AspireCrud_ApiService>("apiservice"
 builder.Build().Run();
 ```
 
-#### Adding Angular
-Before we run into next step of creating angular project, I would like to verify my current setup with the following commands. If you do not have these tools installed, you can easily install them by following the instructions on their official websites. If you have npm installed, you can run `npm install -g @angular/cli` to install angular cli globally on your machine.
+#### Creating the Angular Application
+Before creating the Angular project, verify your environment:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % node --version
 v22.15.1
@@ -403,7 +545,7 @@ sinannar@Sinans-MacBook-Pro AspireCrud % npm --version
 sinannar@Sinans-MacBook-Pro AspireCrud % ng --version
 19.2.12
 ```
-By typing `ng new AspiredAngular --style css --routing true --ssr=no` to terminal, at the root of repository, we can create a new angular project with the name `AspiredAngular`. This command will create a new angular project with the default configuration and it will also add the necessary files for us to run the angular application. After running this command, you should see a new folder named `AspiredAngular` in your repository, which contains the angular project. Output will be something like this:
+Then create a new Angular app at the root of the repository:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % ng new AspiredAngular --style css --routing true --ssr=no
 CREATE AspiredAngular/README.md (1478 bytes)
@@ -430,12 +572,15 @@ CREATE AspiredAngular/public/favicon.ico (15086 bytes)
 ✔ Packages installed successfully.
     Directory is already under version control. Skipping initialization of git.
 ```
-Either you can wait for angular cli to install the packages, or you can open another terminal and start adding javascript integration for our aspire application while the installation is in progress. Since it has been for a while, added packages might change overtime.
+This will scaffold a new Angular project with the default configuration.
+
+#### Adding JavaScript Support to Aspire
+While Angular dependencies are installing, we can prepare Aspire to host the frontend:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add javascript
 ✔  The package Aspire.Hosting.JavaScript::13.1.1 was added successfully.
 ```
-We will adapt aspire apphost to serve our angular application by using `AddJavaScriptApp` method, as shown below. With this change, AppHost should look like below
+Now update `AppHost.cs` to include the Angular app:
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -454,14 +599,22 @@ var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName:
     
 builder.Build().Run();
 ```
+This tells Aspire to:
+- Run the Angular app using npm start
+- Install dependencies automatically
+- Wire it to the API service
+- Expose it on http://localhost:4200
 
+#### Running the Application
 When you run via `aspire run`, you should see `spa-installer` will be run before `spa` is running.
 <img width="950px;" src="/006/ss-07.png">
 <img width="950px;" src="/006/ss-08.png">
-When everything is ready, you can navigate to `http://localhost:4200` and you should see the default angular application running.
+Once everything is ready, navigate to: http://localhost:4200 and you should see the default angular application running.
 
-#### Consuming the API from Angular
-Create a new file under angular project called `proxy.conf.json` and populate it with the following
+#### Configuring and Registering Proxy
+Before calling the API directly from Angular, we’ll configure a development proxy. This allows the frontend to communicate with the API without running into CORS issues and keeps the setup aligned with Aspire’s service discovery.
+
+Create a new file in the Angular project called `proxy.conf.js` and add the following:
 ```js
 module.exports = {
   "/api": {
@@ -477,7 +630,15 @@ module.exports = {
   },
 };
 ```
-Then update `angular.json` file to include the proxy configuration in the serve options in `projects.AspiredAngular.architect.serve.options` section, as shown below
+Next, update `angular.json` to enable the proxy configuration.
+
+Under `projects.AspiredAngular.architect.serve`, add:
+```json
+"options": {
+  "proxyConfig": "proxy.conf.js"
+},
+```
+Should look like this:
 ```json
 {
   "projects": {
@@ -497,7 +658,14 @@ Then update `angular.json` file to include the proxy configuration in the serve 
   }
 }
 ```
-Create the weatherforecast model `AspireCrud/AspiredAngular/src/app/models/weather-forecast.model.ts` with the following content
+With this setup:
+- Angular can call the API using /api/... paths
+- Requests are automatically routed to the correct Aspire service
+- You avoid CORS issues during local development
+- The setup stays environment-aware (no hardcoded URLs)
+
+#### Creating Models and Services in Angular
+Start by defining a model that matches the API contract. Create `src/app/models/weather-forecast.model.ts`:
 ```typescript
 export interface WeatherForecast {
   id?: number;
@@ -508,7 +676,8 @@ export interface WeatherForecast {
   description?: string;
 }
 ```
-Create the weather service `AspireCrud/AspiredAngular/src/app/services/weather.service.ts` with the following content
+
+Next, create a service to encapsulate all API interactions. Create `src/app/services/weather.service.ts`:
 ```typescript
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -548,7 +717,10 @@ export class WeatherService {
   }
 }
 ```
-Update `app.config.ts` file to provide http client configuration for our api service, as shown below
+By using `/api/...` as the base URL, requests are automatically routed through the Aspire proxy to the API service.
+
+#### Configuring HttpClient
+Finally, enable HTTP support in your Angular application. Update app.config.ts:
 ```typescript
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -564,7 +736,16 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 ```
-Update `app.component.ts` file to consume the weather service and display the data in the UI, as shown below
+
+At this point:
+- Angular is fully connected to your Aspire API
+- All CRUD operations are accessible via a typed service
+- No hardcoded URLs are required (thanks to the proxy + Aspire)
+
+#### Updating the App Component
+Now that the Angular service is in place, we can connect it to the UI.
+
+Update `app.component.ts` to consume the WeatherService and manage the data displayed in the application:
 ```typescript
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -722,7 +903,8 @@ export class AppComponent implements OnInit {
   }
 }
 ```
-update `app.component.html` file to display the data and provide UI for CRUD operations, as shown below
+
+Next, update `app.component.html` to render the weather forecasts and provide a simple interface for create, update, delete, and batch operations:
 ```html
 <div class="container">
   <header>
@@ -864,7 +1046,7 @@ update `app.component.html` file to display the data and provide UI for CRUD ope
 </div>
 ```
 
-Update `app.component.css` file to add some basic styling, as shown below
+Finally, add some basic styling in `app.component.css`:
 ```css
 * {
   box-sizing: border-box;
@@ -1231,16 +1413,33 @@ h1 {
 }
 ```
 
-When you run `aspire run` and navigate to `http://localhost:4200`, you should see the angular application with the weather forecasts being loaded from the api service. You can create, update, delete and create batch of forecasts using the UI and see the changes being reflected in the database. You can also see the logs and metrics on the dashboard for both api service and angular frontend.
+#### Running the Application
+With those changes in place, run the application again using `aspire run`, then navigate to `http://localhost:4200`. You should now see the Angular frontend loading weather forecast data from the API service. From the UI, you can create, update, delete, and batch-create forecasts, with changes reflected immediately in both the interface and the database.
 <img width="650px;" src="/006/ss-09.png">
 
-You can edit an item, create a batch of them, and delete them as well. All operations should be working seamlessly and you should see the changes in the UI immediately after performing any action. This is the power of having a distributed application with a well-defined API and a decoupled frontend.
+You can also edit existing items, generate a batch of forecasts, and remove records as needed.
 <img width="650px;" src="/006/ss-10.png">
 
+At this point, the application demonstrates one of the key strengths of this approach: `a decoupled frontend` working seamlessly with a `well-defined backend API`, all orchestrated through Aspire.
+
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
 ### Azure Function Integration
-#### Creating Azure Function Project and Integration with Aspire
-Now we are going to create an azure function and leverage aspire to integrate it with our existing application. Azure functions are serverless compute services that allow you to run code on-demand without having to worry about infrastructure. With aspire, we can easily add an azure function to our application and have it interact with our existing services and database. To add an azure function, we are going to use `func` cli. By following the commands below, you can create a new function project and add it to our existing solution.
+
+#### Creating the Function Project
+Next, let’s introduce Azure Functions to handle background or event-driven workloads.
+
+Azure Functions provide a serverless compute model, and with Aspire, we can integrate them seamlessly into our existing application.
+
+We’ll start by creating a new function project using the func CLI:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % func --version
 4.5.0
@@ -1252,7 +1451,8 @@ sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.Functio
 Reference `..\AspireCrud.Function\AspireCrud_Function.csproj` added to the project.
 ```
 
-Currently my `func` cli creates the azure function with `net8.0` target framework but we are working with `net10.0` so we need to update the target framework of the function project to `net10.0` by editing the `AspireCrud.Function.csproj` file and changing the `TargetFramework` property to `net10.0`, as shown below
+#### Updating the Target Framework
+By default, as of now, the Functions project targets .NET 8. Since our solution is using .NET 10, update the target framework in AspireCrud.Function.csproj:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -1260,12 +1460,17 @@ Currently my `func` cli creates the azure function with `net8.0` target framewor
   </PropertyGroup>
 </Project>
 ```
+
+#### Applying Service Defaults
 Then we will reference ServiceDefault project to our function project to use opinionated best practices by running the following command in terminal
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.ServiceDefaults/AspireCrud.ServiceDefaults.csproj --project AspireCrud.Function/AspireCrud_Function.csproj
 Reference `..\AspireCrud.ServiceDefaults\AspireCrud.ServiceDefaults.csproj` added to the project.
 ```
+This brings in the same defaults we’ve been using across the application (telemetry, service discovery, etc.).
 
+#### Adding Azure Resources to Aspire and Updating `AppHost.cs`
+Next, install the required Aspire integrations:
 Since we successfully created the function project and added it to our solution, lets work on our aspire setup.
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-storage
@@ -1274,7 +1479,8 @@ sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-functions
 ✔  The package Aspire.Hosting.Azure.Functions::13.1.1 was added successfully.
 ```
 
-We should update our `AppHost.cs` to add function project and azure storage configuration to used by Azure Function. Code should look like below:
+Now we can wire everything together in `AppHost.cs`:
+
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -1301,12 +1507,21 @@ var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName:
 
 builder.Build().Run();
 ```
-When we run the application with `aspire run`, you can also see the dependency graph in the dashboard.
+
+With this setup:
+- Azure Storage is provisioned locally using an emulator
+- The Function App is registered and connected to the API
+- Aspire manages dependencies and startup order automatically
+
+#### Running the Application
+Run the application again with`aspire run`, You should now see the Azure Function as part of the distributed application in the Aspire dashboard. The dependency graph clearly shows how the function integrates with the rest of the system, making it easier to reason about interactions between services. 
 <img width="650px;" src="/006/ss-11.png">
 <img width="650px;" src="/006/ss-12.png">
 
 #### Creating a Function and Interacting with API Service
-Lets create the function that will be triggerred by timer via running `func new` in `AspireCrud.Function` project.
+Now that the function project is part of our Aspire application, let’s implement a function that interacts with the API service.
+
+We’ll create a timer-triggered function: `func new` in `AspireCrud.Function` project.
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % cd AspireCrud.Function 
 sinannar@Sinans-MacBook-Pro AspireCrud.Function % func new --name WeatherSummaryEnricher --template "Timer trigger"
@@ -1318,7 +1533,10 @@ Function name: [Timer trigger] WeatherSummaryEnricher
 Creating dotnet function...
 The function "WeatherSummaryEnricher" was created successfully from the "Timer trigger" template.
 ```
-Lets work on our `Program.cs` on our function project by adding http client to call api service.
+This creates a function that runs on a schedule and allows us to execute background logic.
+
+#### Calling the API from the Function
+To enable communication with the API service, update `Program.cs` in the function project to register an HttpClient:
 ```csharp
 using System.Net.Http.Json;
 using Microsoft.Azure.Functions.Worker;
@@ -1341,8 +1559,14 @@ builder.Services.AddHttpClient<WeatherForecastClient>(client =>
 });
 
 builder.Build().Run();
+```
+Notice the base address:👉 `https+http://apiservice`
 
+This uses Aspire’s service discovery, allowing the function to call the API without hardcoding URLs.
 
+#### Creating the API Client
+Next, define a simple client to interact with the API. This keeps all API interactions encapsulated and reusable.
+```csharp
 public class WeatherForecastClient
 {
     private readonly HttpClient _httpClient;
@@ -1395,7 +1619,8 @@ public class WeatherForecast
 }
 ```
 
-We need to update our `WeatherSummaryEnricher.cs` function as below
+#### Implementing the Function
+Now update WeatherSummaryEnricher.cs:
 ```csharp
 using System;
 using Microsoft.Azure.Functions.Worker;
@@ -1461,26 +1686,63 @@ public class WeatherSummaryEnricher(ILoggerFactory loggerFactory, WeatherForecas
     }
 }
 ```
+This function:
+- Runs on a timer
+- Retrieves weather forecasts from the API
+- Normalises the Summary based on temperature
+- Updates records when needed
+
+#### Running and Observing
+Once everything is in place, run the application: `aspire run`
 With all the code is put in place, we should see function working on our traces calling our APIs.
 <img width="650px;" src="/006/ss-13.png">
 <img width="650px;" src="/006/ss-14.png">
 
-What does this function do is that fix the summary of weather forecast that was randomised before
+The function is effectively enriching your data in the background:
+- Initial data is randomly generated
+- The function corrects summaries based on temperature
+- Updates are persisted via the API
+
 <img width="650px;" src="/006/ss-15.png">
 <img width="650px;" src="/006/ss-16.png">
 
-### Github Models Integration
-With Github Models, we can put a better description for our weather forecast. We are going to work on it now in this section. 
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
+<!--  -->
 
-#### Dependencies and Setup
-We are going to run the following commands to install dependencies and set up our application to use github models.
+### Github Models Integration
+So far, our function standardises weather summaries. Now we’ll take it a step further by using GitHub Models to generate richer, human-friendly descriptions for each forecast.
+
+#### Adding Dependencies
+Start by installing the required packages:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add github-models
 ✔  The package Aspire.Hosting.GitHub.Models::13.1.1 was added successfully.
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet add ./AspireCrud.Function/AspireCrud_Function.csproj package Aspire.Azure.AI.Inference --version 13.1.0-preview.1.25616.3
 ```
 
-We will adapt our app host to use github models, `AppHost.cs` should look like below:
+#### Registering the Model in AppHost
+Update AppHost.cs to include a GitHub model:
+```csharp
+using Aspire.Hosting.GitHub;
+
+var model = GitHubModel.OpenAI.OpenAIGpt4o;
+var chat = builder.AddGitHubModel("chat", model);
+```
+Then wire it into the function:
+```csharp
+var function = builder.AddAzureFunctionsProject<Projects.AspireCrud_Function>("function")
+    .WithReference(apiService).WaitFor(apiService)
+    .WithReference(chat).WaitFor(chat)
+    .WithHostStorage(storage);
+```
+This makes the model available to the function via Aspire’s service wiring. Final `AppHost.cs` should look like below:
 ```csharp
 using Aspire.Hosting.GitHub;
 
@@ -1514,7 +1776,8 @@ var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName:
 builder.Build().Run();
 ```
 
-We are going to create a new service that will use the chat client to get description for our weather forecasts and we will call this service from our function to update the description of our forecasts. Below is the code for the service that uses chat client to get description for weather forecasts.
+#### Creating a Description Service
+Next, create a service that uses the model to generate descriptions:
 ```csharp
 public interface IForecastDescriber
 {
@@ -1540,14 +1803,16 @@ public class ForecastDescriber(IChatClient chatClient, ILoggerFactory loggerFact
     }
 }
 ```
-
-We are going to register `IForecastDescriber` as well as `IChatClient` to our dependency injection container in `Program.cs` file in Function App as below:
+#### Registering the Description Service
+In Program.cs of the function app:
 ```csharp
 builder.AddAzureChatCompletionsClient("chat").AddChatClient();
 builder.Services.AddScoped<IForecastDescriber, ForecastDescriber>();
 ```
 
-Now we can update our `WeatherSummaryEnricher` function to use `IForecastDescriber` to get description for our forecasts and update them in the database. Below is the updated code for `WeatherSummaryEnricher` function. Insert the code below, just after `forecast.Summary = correctSummary;` line in the function
+#### Enhancing the Function
+Now update the function to enrich forecasts with AI-generated descriptions.
+After setting the summary, add:
 ```csharp
 if(string.IsNullOrWhiteSpace(forecast.Description) && enrichmentCount < 2)
 {
@@ -1557,31 +1822,51 @@ if(string.IsNullOrWhiteSpace(forecast.Description) && enrichmentCount < 2)
     ++enrichmentCount;
 }
 ```
-To make this work, do not forget to inject `IForecastDescriber` to the function as well, constructor of the function should look like below:
+
+And update the constructor:
 ```csharp
 public class WeatherSummaryEnricher(ILoggerFactory loggerFactory
     , WeatherForecastClient weatherClient
     , IForecastDescriber describer)
 ```
-You may realize I am using `enrichmentCount` variable to limit the number of calls to describer in order to stay within the token limits of the model. This is just for demonstration purposes, you can implement a more robust solution for this in production scenarios. Just do not forget to initalize `enrichmentCount` variable in the function. When you run the app with `aspire run` you may see the `unresolved parameter` error shown as below
-<img width="650px;" src="/006/ss-17.png">
+The enrichmentCount is used here to limit model calls and avoid excessive token usage during the demo.
 
-#### Github Token for Github Models
-Navigate to your github, and from top right corner, click your profile to navigate to `Settings`. Then from left menu, click `Developer settings` at the bottom, and then click `Personal access tokens`, choose `Fine-grained tokens`. Click `Generate new token` button to generate a new token. Repository access need to be `Public Repositories` and from permission, search for `Models` and select it. Provide a name and description, as well as an expiration date, then  generate the token. Copy the generated token, we will need it for our next step.
+#### Configuring GitHub Access
+To use GitHub Models, you’ll need a personal access token:
 
-On aspire dashboard, click `enter value` for the error, and provide the value you copied.
+1. Go to GitHub → Settings → Developer settings
+2. Create a fine-grained token
+3. Grant access to:
+   - Public repositories
+   - Models permission
+4. Copy the token
+
+In the Aspire dashboard, provide the token when prompted:
 <img width="650px;" src="/006/ss-18.png">
 
-Now when the function is triggerred, we can see it at the traces as shown below
+#### Observing AI in Action
+Once the application is running, the function will:
+- Fetch forecasts from the API
+- Generate descriptions using the model
+- Update the database
+
 <img width="650px;" src="/006/ss-19.png">
 
-When we deep dive into the trace, we see this spesific icon for `GenAI` details
-<img width="650px;" src="/006/ss-20.png">
+Aspire also provides GenAI tracing, allowing you to inspect:
+- Prompts sent to the model
+- Responses returned
+- Token usage and execution details
 
-If we click this `GenAI` icon, we can see the details for the model call, including the prompt we sent to the model, and the response we got back from the model. This is very useful for debugging and understanding how our application is interacting with the model.
+<img width="650px;" src="/006/ss-20.png">
 <img width="650px;" src="/006/ss-21.png">
 
-With this way, our function is calling our API to enrich the weather forecasts with better descriptions generated by the model. This is a powerful way to enhance our application with AI capabilities without having to manage the infrastructure for it, thanks to Github Models and Aspire.
+#### What This Enables
+At this point, your application:
+- Generates data via the API
+- Processes it in the background using Functions
+- Enriches it using AI models
+- Surfaces everything through a frontend
+
 <img width="650px;" src="/006/ss-22.png">
 
 ### References
@@ -1598,5 +1883,5 @@ With this way, our function is calling our API to enrich the weather forecasts w
 - [Azure Function | .NET Aspire Integration](https://learn.microsoft.com/en-us/azure/azure-functions/dotnet-aspire-integration)
 - [Tech Comm | Github Model Catalog](https://techcommunity.microsoft.com/blog/educatordeveloperblog/github-model-catalog---getting-started/4212711)
 - [Github Models](https://github.com/marketplace?type=models)
-- [Code](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026)
-- [Video](https://www.youtube.com/watch?v=iRWv_ExEzfI)
+- [Final Code](https://github.com/AucklandDotnetMeetup/OneAppHostManyWorlds-11Feb2026)
+- [Live Demo Video](https://www.youtube.com/watch?v=iRWv_ExEzfI)
