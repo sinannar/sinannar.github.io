@@ -1,160 +1,70 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={`Speaking | ${SITE_TITLE}`} />
+    <BaseHead
+      title={`Speaking | ${SITE_TITLE}`}
+      description={SITE_DESCRIPTION}
+    />
   </head>
   <body>
     <Header />
     <main>
       <section style="max-width: 900px; margin: 2rem auto;">
-        <h1 style="font-size:2.2rem; margin-bottom:1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;">Public Speaking &amp; Meetups</h1>
+        <h1
+          style="font-size:2.2rem; margin-bottom:1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;"
+        >
+          Public Speaking &amp; Meetups
+        </h1>
+
+        <!-- Speaking Engagements -->
+        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Public Speakings</h2>
+
 
         <!-- Organiser Groups -->
-        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Community Groups</h2>
-        <p style="color:#555; margin-bottom:1.2rem;">Meetup groups I help organise:</p>
+        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Organizer for</h2>
+
         <ul class="group-list">
           <li>
-            <a href="https://www.meetup.com/coding-night-anz/" target="_blank" rel="noopener noreferrer" class="group-pill">
-              Coding Night ANZ
+            <a
+              href="https://www.meetup.com/akl-net/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group-pill"
+            >
+              <span class="group-image-frame">
+              <img
+                src="/meetups/groups/dotnet-ug.avif"
+                alt="Auckland .NET User Group logo"
+              />
+              <span class="group-name">Auckland .NET User Group</span>
+              </span>
             </a>
           </li>
           <li>
-            <a href="https://www.meetup.com/akl-net/" target="_blank" rel="noopener noreferrer" class="group-pill">
-              Auckland .NET User Group
+            <a
+              href="https://www.meetup.com/auckland-azure-usergroup/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group-pill"
+            >
+              <span class="group-image-frame">
+              <img
+                src="/meetups/groups/azure-ug.avif"
+                alt="Aotearoa Azure Meetup logo"
+              />
+              <span class="group-name">Aotearoa Azure Meetup</span>
+              </span>
             </a>
           </li>
-          <li>
-            <a href="https://www.meetup.com/auckland-azure-usergroup/" target="_blank" rel="noopener noreferrer" class="group-pill">
-              Auckland Azure User Group
-            </a>
-          </li>
-          <li>
-            <a href="https://www.meetup.com/auckland-kubernetes/" target="_blank" rel="noopener noreferrer" class="group-pill">
-              Auckland Kubernetes
-            </a>
-          </li>
-          <li>
-            <a href="https://www.meetup.com/juniordev-auckland/" target="_blank" rel="noopener noreferrer" class="group-pill">
-              JuniorDev Auckland
-            </a>
-          </li>
+
         </ul>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:2rem 0;"/>
-
-        <!-- Presentations (reverse chronological order) -->
-        <h2 style="font-size:1.5rem; margin-bottom:1.2rem;">Presentations</h2>
-
-        <!-- 11 Feb 2026 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/akl-net/events/312937841" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Auckland .NET User Group
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">11 February 2026</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 10 Dec 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/akl-net/events/312148446" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Auckland .NET User Group
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">10 December 2025</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 26 Oct 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/auckland-kubernetes/events/310247791" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Auckland Kubernetes
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">26 October 2025</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 6 Oct 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/juniordev-auckland/events/310074767/" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                JuniorDev Auckland
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">6 October 2025</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 25 Sept 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/coding-night-anz/events/310396975" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Coding Night ANZ
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">25 September 2025</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 16 Sept 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/auckland-azure-usergroup/events/310859388" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Auckland Azure User Group
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">16 September 2025</time>
-          </header>
-        </article>
-
-        <hr style="border:none; border-top:1px solid #eee; margin:1.5rem 0;"/>
-
-        <!-- 15 Sept 2025 -->
-        <article style="margin-bottom:2rem;">
-          <header style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap;">
-            <div>
-              <a href="https://www.meetup.com/coding-night-anz/events/310800666" target="_blank" rel="noopener noreferrer"
-                style="font-size:1.1rem; font-weight:600; color:#2337ff; text-decoration:none;">
-                Coding Night ANZ
-              </a>
-            </div>
-            <time style="color:#666; font-size:0.95rem;">15 September 2025</time>
-          </header>
-        </article>
-
       </section>
     </main>
     <Footer />
@@ -167,23 +77,76 @@ import { SITE_TITLE } from '../consts';
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 2rem;
     margin-bottom: 2.5rem;
   }
 
+  .group-list li {
+    flex: 1 1 320px;
+    max-width: 360px;
+  }
+
   .group-pill {
-    display: inline-block;
-    padding: 0.5em 1.1em;
-    background: #f0f4ff;
-    border: 1px solid #c7d3f5;
-    border-radius: 6px;
-    color: #2337ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+    width: 100%;
     text-decoration: none;
-    font-weight: 500;
-    font-size: 1rem;
+    transition:
+      transform 180ms ease,
+      filter 180ms ease;
   }
 
   .group-pill:hover {
-    background: #e0e8ff;
+    transform: translateY(-5px);
+    filter: saturate(1.04);
+  }
+
+  .group-image-frame {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 220px;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(35, 55, 255, 0.1), transparent 60%),
+      linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
+    border: 1px solid rgba(183, 199, 247, 0.7);
+    border-radius: 28px;
+    box-shadow:
+      0 18px 34px rgba(38, 66, 156, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .group-pill img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 12px;
+    filter: drop-shadow(0 14px 24px rgba(35, 55, 255, 0.12));
+  }
+
+  .group-name {
+    color: #324488;
+    font-weight: 700;
+    font-size: 0.98rem;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 720px) {
+    .group-list {
+      gap: 1.5rem;
+    }
+
+    .group-image-frame {
+      min-height: 190px;
+      border-radius: 22px;
+    }
+
+    .group-pill img {
+      max-width: 260px;
+    }
   }
 </style>
