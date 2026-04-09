@@ -1433,8 +1433,13 @@ At this point, the application demonstrates one of the key strengths of this app
 <!--  -->
 
 ### Azure Function Integration
-#### Creating Azure Function Project and Integration with Aspire
-Now we are going to create an azure function and leverage aspire to integrate it with our existing application. Azure functions are serverless compute services that allow you to run code on-demand without having to worry about infrastructure. With aspire, we can easily add an azure function to our application and have it interact with our existing services and database. To add an azure function, we are going to use `func` cli. By following the commands below, you can create a new function project and add it to our existing solution.
+
+#### Creating the Function Project
+Next, let’s introduce Azure Functions to handle background or event-driven workloads.
+
+Azure Functions provide a serverless compute model, and with Aspire, we can integrate them seamlessly into our existing application.
+
+We’ll start by creating a new function project using the func CLI:
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % func --version
 4.5.0
@@ -1446,7 +1451,8 @@ sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.Functio
 Reference `..\AspireCrud.Function\AspireCrud_Function.csproj` added to the project.
 ```
 
-Currently my `func` cli creates the azure function with `net8.0` target framework but we are working with `net10.0` so we need to update the target framework of the function project to `net10.0` by editing the `AspireCrud.Function.csproj` file and changing the `TargetFramework` property to `net10.0`, as shown below
+#### Updating the Target Framework
+By default, as of now, the Functions project targets .NET 8. Since our solution is using .NET 10, update the target framework in AspireCrud.Function.csproj:
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -1454,12 +1460,17 @@ Currently my `func` cli creates the azure function with `net8.0` target framewor
   </PropertyGroup>
 </Project>
 ```
+
+#### Applying Service Defaults
 Then we will reference ServiceDefault project to our function project to use opinionated best practices by running the following command in terminal
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % dotnet reference add AspireCrud.ServiceDefaults/AspireCrud.ServiceDefaults.csproj --project AspireCrud.Function/AspireCrud_Function.csproj
 Reference `..\AspireCrud.ServiceDefaults\AspireCrud.ServiceDefaults.csproj` added to the project.
 ```
+This brings in the same defaults we’ve been using across the application (telemetry, service discovery, etc.).
 
+#### Adding Azure Resources to Aspire and Updating `AppHost.cs`
+Next, install the required Aspire integrations:
 Since we successfully created the function project and added it to our solution, lets work on our aspire setup.
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-storage
@@ -1468,7 +1479,8 @@ sinannar@Sinans-MacBook-Pro AspireCrud % aspire add azure-functions
 ✔  The package Aspire.Hosting.Azure.Functions::13.1.1 was added successfully.
 ```
 
-We should update our `AppHost.cs` to add function project and azure storage configuration to used by Azure Function. Code should look like below:
+Now we can wire everything together in `AppHost.cs`:
+
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -1495,12 +1507,21 @@ var spaWeb = builder.AddJavaScriptApp("spa", "../AspiredAngular", runScriptName:
 
 builder.Build().Run();
 ```
-When we run the application with `aspire run`, you can also see the dependency graph in the dashboard.
+
+With this setup:
+- Azure Storage is provisioned locally using an emulator
+- The Function App is registered and connected to the API
+- Aspire manages dependencies and startup order automatically
+
+#### Running the Application
+Run the application again with`aspire run`, You should now see the Azure Function as part of the distributed application in the Aspire dashboard. The dependency graph clearly shows how the function integrates with the rest of the system, making it easier to reason about interactions between services. 
 <img width="650px;" src="/006/ss-11.png">
 <img width="650px;" src="/006/ss-12.png">
 
 #### Creating a Function and Interacting with API Service
-Lets create the function that will be triggerred by timer via running `func new` in `AspireCrud.Function` project.
+Now that the function project is part of our Aspire application, let’s implement a function that interacts with the API service.
+
+We’ll create a timer-triggered function: `func new` in `AspireCrud.Function` project.
 ```shell
 sinannar@Sinans-MacBook-Pro AspireCrud % cd AspireCrud.Function 
 sinannar@Sinans-MacBook-Pro AspireCrud.Function % func new --name WeatherSummaryEnricher --template "Timer trigger"
@@ -1512,7 +1533,10 @@ Function name: [Timer trigger] WeatherSummaryEnricher
 Creating dotnet function...
 The function "WeatherSummaryEnricher" was created successfully from the "Timer trigger" template.
 ```
-Lets work on our `Program.cs` on our function project by adding http client to call api service.
+This creates a function that runs on a schedule and allows us to execute background logic.
+
+#### Calling the API from the Function
+To enable communication with the API service, update `Program.cs` in the function project to register an HttpClient:
 ```csharp
 using System.Net.Http.Json;
 using Microsoft.Azure.Functions.Worker;
@@ -1535,8 +1559,14 @@ builder.Services.AddHttpClient<WeatherForecastClient>(client =>
 });
 
 builder.Build().Run();
+```
+Notice the base address:👉 `https+http://apiservice`
 
+This uses Aspire’s service discovery, allowing the function to call the API without hardcoding URLs.
 
+#### Creating the API Client
+Next, define a simple client to interact with the API. This keeps all API interactions encapsulated and reusable.
+```csharp
 public class WeatherForecastClient
 {
     private readonly HttpClient _httpClient;
@@ -1589,7 +1619,8 @@ public class WeatherForecast
 }
 ```
 
-We need to update our `WeatherSummaryEnricher.cs` function as below
+#### Implementing the Function
+Now update WeatherSummaryEnricher.cs:
 ```csharp
 using System;
 using Microsoft.Azure.Functions.Worker;
@@ -1655,11 +1686,23 @@ public class WeatherSummaryEnricher(ILoggerFactory loggerFactory, WeatherForecas
     }
 }
 ```
+This function:
+- Runs on a timer
+- Retrieves weather forecasts from the API
+- Normalises the Summary based on temperature
+- Updates records when needed
+
+#### Running and Observing
+Once everything is in place, run the application: `aspire run`
 With all the code is put in place, we should see function working on our traces calling our APIs.
 <img width="650px;" src="/006/ss-13.png">
 <img width="650px;" src="/006/ss-14.png">
 
-What does this function do is that fix the summary of weather forecast that was randomised before
+The function is effectively enriching your data in the background:
+- Initial data is randomly generated
+- The function corrects summaries based on temperature
+- Updates are persisted via the API
+
 <img width="650px;" src="/006/ss-15.png">
 <img width="650px;" src="/006/ss-16.png">
 
