@@ -6,7 +6,7 @@ heroImage: '/007-globalazure-aspirewithai.jpeg'
 ---
 
 ### Intro
-In this blog post, we will create an API project with dotnet to consume github models to create agent. This agent will use MCP toolkit we will be creating as part of the workflow. We will use Aspire to orchestrate the solution and use dashboard to monitor GenAI logs.
+In this blog post, we will create an API project with dotnet to consume github models to create agent. This agent will use MCP toolkit we will be creating as part of the workflow. We will use Aspire to orchestrate the solution and use dashboard to monitor GenAI logs. Final code can be found in [here](https://github.com/sinannar/AspireWithAI_MCP)
 
 ### Setup
 
@@ -216,3 +216,134 @@ We will also call `MapMcp` as below to map mcp server endpoints to our applicati
 app.MapDefaultEndpoints();
 app.MapMcp("/mcp");
 ```
+
+### Implementing API
+Now that we have our mcp server is implemented, we are going to use GitHub Models to create an agent that will use our mcp tool to describe the weather. 
+
+#### Setting up Dependencies
+We will setup GitHub model hosting by using aspire cli, then we will add necessary packages to our api project to consume GitHub models and create agent. You can run the following commands to setup dependencies:
+```bash
+$ aspire add github-models
+✔  The package Aspire.Hosting.GitHub.Models::13.2.2 was added successfully.
+
+$ dotnet add package Aspire.Azure.AI.Inference --project AspireWithAI.Api/AspireWithAI.Api.csproj --prelease
+
+$ dotnet add package Microsoft.Agents.AI --project AspireWithAI.Api/AspireWithAI.Api.csproj
+
+$ dotnet add package ModelContextProtocol --project AspireWithAI.Api/AspireWithAI.Api.csproj 
+```
+
+<i>PS: At the time of writing, Aspire.Azure.AI.Inference had to be added as `prelease`.</i>
+
+#### Setting up GitHub Model at AppHost
+When we added GitHub Models integration through aspire cli, it added `Aspire.Hosting.GitHub.Models` package to `AppHost` project. What we need to do is to add what model we want to use and reference it to our api project as shown below.
+```csharp
+var chat = builder.AddGitHubModel("chat", GitHubModel.OpenAI.OpenAIGpt4oMini);
+
+builder.AddProject<Projects.AspireWithAI_Api>("api")
+    .WithReference(mcp).WaitFor(mcp)
+    .WithReference(chat).WaitFor(chat);
+```
+
+#### Implementing Agent that uses MCP Tool
+We will start setting up using `ChatClient` via the following code in `Program.cs` of `api` project:
+```csharp
+builder.AddAzureChatCompletionsClient("chat")
+    .AddChatClient();
+```
+
+We will then implement our mcp client setup via the following code:
+```csharp
+builder.Services.AddActivatedSingleton(sp =>
+{
+    var mcpClient = McpClient.CreateAsync(new HttpClientTransport(
+    new HttpClientTransportOptions()
+    {
+        Endpoint = new (Environment.GetEnvironmentVariable("services__mcp__https__0")! + "/mcp")
+    })).GetAwaiter().GetResult();
+    return mcpClient;
+});
+```
+
+Next we need to implement an agent that will use both `ChatClient` and `McpClient` to call our tool to describe the weather. We will implement a simple agent as shown below:
+```csharp
+builder.Services.AddActivatedKeyedSingleton("weatheragent", (sp, _) =>
+{
+    var mcpClient = sp.GetRequiredService<McpClient>();
+    var tools = mcpClient.ListToolsAsync().GetAwaiter().GetResult();
+    var chatClient = sp.CreateAsyncScope().ServiceProvider.GetRequiredService<IChatClient>();
+    return chatClient.AsAIAgent(
+        name: "weatheragent",
+        instructions: "you take the weather related information as JSON and provide a summary, including description of the degree in celcius using the mcp tools",
+        tools: [.. tools.Cast<AITool>()]
+    );
+});
+```
+
+#### Implementing API Endpoint to Call Agent
+Finally, we will implement an API endpoint that will call our agent to get the weather description for given degree in celcius. Before we implement the endpoint, we need the record that we removed earlier
+```csharp
+record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+{
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+}
+```
+
+We will implement a simple endpoint as shown below:
+```csharp
+app.MapGet("/weatherforecast", ([FromKeyedServices("weatheragent")] ChatClientAgent weatheragent) =>
+{
+    var forecast =  Enumerable.Range(1, 2).Select(index =>
+        new WeatherForecast
+        (
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            weatheragent.RunAsync($"What is the weather like for a temperature of {Random.Shared.Next(-20, 55)} degree in celcius? Include 3 different language, but include English and Turkish for sure. Response will be shown to human, so no json or other structured format.").Result!.Text
+        ))
+        .ToArray();
+    return forecast;
+})
+.WithName("GetWeatherForecast");
+```
+
+#### Configuring access for GitHub Models
+In my previous blog post, I detailed how to get token for using GitHub models, you can find the details [here](http://localhost:4321/blog/006-dotnetmeetup-february2026/#github-models-integration). 
+
+After you gather your token, you can set it via running the following command in your terminal:
+```bash
+$ aspire secret get Parameters:chat-gh-apikey <YOUR_TOKEN_HERE>
+```
+
+### Testing the Endpoint
+After running the application with `aspire run`, click to the url for `api` project and append it with `/weatherforecast` to see the agent in action as shown below. You should see the weather description for given degree in celcius in different languages including English and Turkish as shown below:
+
+<img width="650px;" src="/007/ss-02.png">
+
+If you navigate to `Traces` on dashboard, you should see the trace for the request you just made and if you click to the trace, you should be able to see the details of the trace including the calls made to mcp server as shown below, this icon indicates GenAI:
+
+<img width="650px;" src="/007/ss-03.png">
+
+When you go to the details of the trace, you can see the detailed journey with multiple chat and tool exeuctions as shown below:
+
+<img width="650px;" src="/007/ss-04.png">
+
+If you open one of the `GenAI` details, you can see the system prompt and user prompt that was sent to the model, as well as duration and tokens at and bunch of other information.
+
+<img width="650px;" src="/007/ss-05.png">
+
+We can see the tool definition that was used as below, at `Tools` section of the trace:
+
+<img width="650px;" src="/007/ss-06.png">
+
+Trace has `Tool Calls` parts you can see the calls made to the tool with the parameter sent:
+
+<img width="650px;" src="/007/ss-07.png">
+
+We can also see the tool response in the trace details as shown below:
+<img width="650px;" src="/007/ss-08.png">
+
+### References
+- [Aspire Dev](https://aspire.dev/)
+- [ModelContextProtocol](https://csharp.sdk.modelcontextprotocol.io/concepts/getting-started.html)
+- [Mcp Dotnet Samples](https://github.com/microsoft/mcp-dotnet-samples)
+- [Code for this blog post](https://github.com/sinannar/AspireWithAI_MCP)
