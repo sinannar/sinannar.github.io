@@ -1,0 +1,175 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  href: string;
+  badge?: string;
+  ctaLabel?: string;
+}
+
+const {
+  title,
+  description,
+  imageSrc,
+  imageAlt,
+  href,
+  badge = "Organizer",
+  ctaLabel = "View Meetup",
+} = Astro.props;
+---
+
+<li class="organizer-card">
+  <div class="organizer-flip-inner">
+    <div class="organizer-face organizer-front">
+      <div class="organizer-thumbnail-frame">
+        <img src={imageSrc} alt={imageAlt} loading="lazy" />
+      </div>
+
+      <div class="organizer-front-body">
+        <h3 class="organizer-title organizer-title-front">{title}</h3>
+      </div>
+    </div>
+
+    <div class="organizer-face organizer-back">
+      <span class="organizer-event">{badge}</span>
+      <h3 class="organizer-title">{title}</h3>
+      <p class="organizer-desc">{description}</p>
+      <div class="organizer-footer">
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="organizer-cta"
+        >{ctaLabel} &rarr;</a>
+      </div>
+    </div>
+  </div>
+</li>
+
+<style>
+  .organizer-card {
+    list-style: none;
+    width: 100%;
+    perspective: 900px;
+  }
+
+  .organizer-flip-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transition: transform 500ms cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 14px;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+  }
+
+  .organizer-card:hover .organizer-flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .organizer-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .organizer-front {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid rgba(209, 213, 219, 0.9);
+  }
+
+  .organizer-back {
+    background: linear-gradient(145deg, #0f1f3d 0%, #1a3a6e 100%);
+    color: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1.1rem;
+  }
+
+  .organizer-thumbnail-frame {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 55%),
+      linear-gradient(180deg, #eef4ff 0%, #dbeafe 100%);
+  }
+
+  .organizer-thumbnail-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+    filter: drop-shadow(0 12px 20px rgba(37, 99, 235, 0.12));
+  }
+
+  .organizer-front-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem 1.15rem;
+  }
+
+  .organizer-event {
+    color: #93c5fd;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .organizer-title {
+    margin: 0;
+    color: #fff;
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .organizer-title-front {
+    color: #111827;
+    text-align: center;
+  }
+
+  .organizer-desc {
+    margin: 0;
+    color: #dbeafe;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+  }
+
+  .organizer-footer {
+    margin-top: auto;
+  }
+
+  .organizer-cta {
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
+  }
+
+  .organizer-cta:hover {
+    background: rgba(255, 255, 255, 0.22);
+  }
+</style>
