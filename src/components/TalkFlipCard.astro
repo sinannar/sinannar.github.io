@@ -1,0 +1,164 @@
+---
+interface Props {
+  imageSrc: string;
+  event: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  href: string;
+  linkLabel?: string;
+}
+
+const {
+  imageSrc,
+  event,
+  title,
+  description,
+  date,
+  location,
+  href,
+  linkLabel = "View Event",
+} = Astro.props;
+---
+
+<li class="talk-flip-wrapper">
+  <div class="talk-flip-inner">
+    <div class="talk-face talk-front">
+      <img src={imageSrc}/>
+    </div>
+    <div class="talk-face talk-back">
+      <span class="talk-event">{event}</span>
+      <h3 class="talk-title">{title}</h3>
+      <p class="talk-desc">{description}</p>
+      <div class="talk-details">
+        <span class="talk-date">{date}</span>
+        <span class="talk-location">{location}</span>
+      </div>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="talk-link"
+      >{linkLabel} &rarr;</a>
+    </div>
+  </div>
+</li>
+
+<style>
+  .talk-flip-wrapper {
+    width: 100%;
+    perspective: 900px;
+  }
+
+  .talk-flip-inner {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    transform-style: preserve-3d;
+    transition: transform 500ms cubic-bezier(0.4, 0.2, 0.2, 1);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(38, 66, 156, 0.1);
+  }
+
+  .talk-flip-wrapper:hover .talk-flip-inner {
+    transform: rotateY(180deg);
+  }
+
+  .talk-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .talk-front {
+    background: #0d1b2a;
+  }
+
+  .talk-front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .talk-back {
+    background: linear-gradient(145deg, #0f1f3d 0%, #1a3a6e 100%);
+    color: #fff;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 1.1rem;
+  }
+
+  .talk-event {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #60a5fa;
+  }
+
+  .talk-title {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+  }
+
+  .talk-desc {
+    margin: 0;
+    font-size: 0.7rem;
+    color: #bfdbfe;
+    line-height: 1.5;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+  }
+
+  .talk-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .talk-date,
+  .talk-location {
+    font-size: 0.75rem;
+    color: #93c5fd;
+  }
+
+  .talk-date::before {
+    content: "\1F4C5  ";
+  }
+
+  .talk-location::before {
+    content: "\1F4CD  ";
+  }
+
+  .talk-link {
+    margin-top: 0.5rem;
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 0.35rem 0.75rem;
+    text-decoration: none;
+    transition: background 150ms ease;
+  }
+
+  .talk-link:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+</style>
