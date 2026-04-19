@@ -3,7 +3,18 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import TalkFlipCard from "../components/TalkFlipCard.astro";
+import YouTubeRecordingCard from "../components/YouTubeRecordingCard.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+
+interface Recording {
+  title: string;
+  event: string;
+  description: string;
+  date: string;
+  videoId?: string;
+  href?: string;
+  ctaLabel?: string;
+}
 
 const talks = [
   
@@ -99,13 +110,55 @@ const talks = [
   },
   {
     imageSrc: "/meetups/talks/001-juniordev-6aug2025.jpg",
-    event: "Aotearoa Azure Meetup",
+    event: "Junior Devs",
     title: "Exploring .Net Aspire by Sinan Nar",
     description:
       "In this short talk, Sinan will talk about how .Net Aspire may help developer experience with a quick demo.",
     date: "Aug 6, 2025",
     location: "Xero Ltd, Auckland",
     href: "https://www.meetup.com/juniordev-auckland/events/310074767",
+  },
+];
+
+const recordings: Recording[] = [
+  {
+    event: "Coding Night ANZ",
+    title: "Global Azure",
+    description:
+      "GlobalAzure is a worldwide community event dedicated to Microsoft Azure.",
+    date: "Apr 18, 2025",
+    videoId: "LNkjFjBJFA4",
+  },
+  {
+    event: "Auckland .Net User Group",
+    title: "One AppHost, Many Worlds: .NET Aspire in Practice",
+    description:
+      "Sinan explore how Aspire can be used as the backbone of a modern application by building and evolving a distributed system live.",
+    date: "Feb 11, 2026",
+    videoId: "Z29pUURgmQ0",
+  },
+  {
+    event: "Coding Night ANZ",
+    title: "Running Multi-Service Apps Locally with .NET Aspire",
+    description:
+      ".NET Aspire makes it easier by giving you a single, developer-friendly way to run and connect everything without drowning in configs.",
+    date: "Sep 15, 2025",
+    videoId: "VVFrB9c1xPs",
+  },
+  {
+    title: ".NET Aspire and Azure Developer CLI",
+    event: "Aotearoa Azure Meetup",
+    description: "Session recording covering .NET Aspire and azd.",
+    date: "Sep 18, 2025",
+    videoId: "zCn6lGePIwU",
+  },
+  {
+    event: "Auckland Kubernetes Meetup",
+    title: ".NET Aspire and Aspir8",
+    description:
+      "Deploying .NET application on Kubernetes using Aspir8, an open-source project that handles the generation of deployment YAML based on app host",
+    date: "Aug 26, 2025",
+    videoId: "8COkFo1Z9r8",
   },
 ];
 ---
@@ -134,6 +187,20 @@ const talks = [
         <ul class="talks-list">
           {talks.map((talk) => <TalkFlipCard {...talk} />)}
         </ul>
+
+        <h2 style="font-size:1.5rem; margin-bottom:1rem;">YouTube Recordings</h2>
+
+        {
+          recordings.length > 0 ? (
+            <ul class="recordings-list">
+              {recordings.map((recording) => <YouTubeRecordingCard {...recording} />)}
+            </ul>
+          ) : (
+            <p class="section-empty-state">
+              YouTube recordings will live here once the session videos are published.
+            </p>
+          )
+        }
       
 
         <!-- Organiser Groups -->
@@ -264,6 +331,25 @@ const talks = [
     margin-bottom: 2.5rem;
   }
 
+  .recordings-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .section-empty-state {
+    margin: 0 0 2.5rem;
+    padding: 1rem 1.1rem;
+    border: 1px dashed rgba(148, 163, 184, 0.9);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+    color: #475569;
+    font-size: 0.95rem;
+  }
+
   @media (max-width: 720px) {
     .group-list {
       gap: 1.5rem;
@@ -282,10 +368,18 @@ const talks = [
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
+
+    .recordings-list {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 1024px) and (min-width: 721px) {
     .talks-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .recordings-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
