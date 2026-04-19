@@ -1,0 +1,147 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  href: string;
+  badge?: string;
+  ctaLabel?: string;
+}
+
+const {
+  title,
+  description,
+  imageSrc,
+  imageAlt,
+  href,
+  badge = "Organizer",
+  ctaLabel = "View Meetup",
+} = Astro.props;
+---
+
+<li class="organizer-card">
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="organizer-link"
+  >
+    <div class="organizer-thumbnail-frame">
+      <img src={imageSrc} alt={imageAlt} loading="lazy" />
+      <span class="organizer-badge">{badge}</span>
+    </div>
+
+    <div class="organizer-body">
+      <span class="organizer-event">Community</span>
+      <h3 class="organizer-title">{title}</h3>
+      <p class="organizer-desc">{description}</p>
+      <div class="organizer-footer">
+        <span class="organizer-cta">{ctaLabel} &rarr;</span>
+      </div>
+    </div>
+  </a>
+</li>
+
+<style>
+  .organizer-card {
+    list-style: none;
+  }
+
+  .organizer-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid rgba(209, 213, 219, 0.9);
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+    text-decoration: none;
+    transition:
+      transform 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+
+  .organizer-link:hover {
+    transform: translateY(-4px);
+    border-color: rgba(59, 130, 246, 0.28);
+    box-shadow: 0 20px 36px rgba(15, 23, 42, 0.12);
+  }
+
+  .organizer-thumbnail-frame {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    padding: 1rem;
+    background:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.18), transparent 55%),
+      linear-gradient(180deg, #eef4ff 0%, #dbeafe 100%);
+  }
+
+  .organizer-thumbnail-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 12px;
+    filter: drop-shadow(0 12px 20px rgba(37, 99, 235, 0.12));
+  }
+
+  .organizer-badge {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.82);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .organizer-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1rem 1.1rem;
+  }
+
+  .organizer-event {
+    color: #2563eb;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .organizer-title {
+    margin: 0;
+    color: #111827;
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .organizer-desc {
+    margin: 0;
+    color: #475569;
+    font-size: 0.86rem;
+    line-height: 1.55;
+  }
+
+  .organizer-footer {
+    margin-top: auto;
+  }
+
+  .organizer-cta {
+    color: #2563eb;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+</style>

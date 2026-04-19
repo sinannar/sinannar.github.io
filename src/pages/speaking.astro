@@ -2,6 +2,7 @@
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import OrganizerCard from "../components/OrganizerCard.astro";
 import TalkFlipCard from "../components/TalkFlipCard.astro";
 import YouTubeRecordingCard from "../components/YouTubeRecordingCard.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
@@ -161,6 +162,25 @@ const recordings: Recording[] = [
     videoId: "8COkFo1Z9r8",
   },
 ];
+
+const organizerGroups = [
+  {
+    title: "Auckland .NET User Group",
+    description:
+      "A monthly Auckland meetup for .NET developers to share practical talks, releases, and real-world engineering lessons.",
+    imageSrc: "/meetups/groups/dotnet-ug.avif",
+    imageAlt: "Auckland .NET User Group logo",
+    href: "https://www.meetup.com/akl-net/",
+  },
+  {
+    title: "Aotearoa Azure Meetup",
+    description:
+      "A community meetup focused on Azure, cloud architecture, and platform engineering sessions across Aotearoa.",
+    imageSrc: "/meetups/groups/azure-ug.avif",
+    imageAlt: "Aotearoa Azure Meetup logo",
+    href: "https://www.meetup.com/auckland-azure-usergroup/",
+  },
+];
 ---
 
 <!doctype html>
@@ -207,39 +227,7 @@ const recordings: Recording[] = [
         <h2 style="font-size:1.5rem; margin-bottom:1rem;">Organizer for</h2>
 
         <ul class="group-list">
-          <li>
-            <a
-              href="https://www.meetup.com/akl-net/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group-pill"
-            >
-              <span class="group-image-frame">
-              <img
-                src="/meetups/groups/dotnet-ug.avif"
-                alt="Auckland .NET User Group logo"
-              />
-              <span class="group-name">Auckland .NET User Group</span>
-              </span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.meetup.com/auckland-azure-usergroup/"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group-pill"
-            >
-              <span class="group-image-frame">
-              <img
-                src="/meetups/groups/azure-ug.avif"
-                alt="Aotearoa Azure Meetup logo"
-              />
-              <span class="group-name">Aotearoa Azure Meetup</span>
-              </span>
-            </a>
-          </li>
-
+          {organizerGroups.map((group) => <OrganizerCard {...group} />)}
         </ul>
       </section>
     </main>
@@ -262,64 +250,10 @@ const recordings: Recording[] = [
   .group-list {
     list-style: none;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2rem;
     margin-bottom: 2.5rem;
-  }
-
-  .group-list li {
-    flex: 1 1 320px;
-    max-width: 360px;
-  }
-
-  .group-pill {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.85rem;
-    width: 100%;
-    text-decoration: none;
-    transition:
-      transform 180ms ease,
-      filter 180ms ease;
-  }
-
-  .group-pill:hover {
-    transform: translateY(-5px);
-    filter: saturate(1.04);
-  }
-
-  .group-image-frame {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    min-height: 220px;
-    padding: 1rem;
-    background:
-      radial-gradient(circle at top, rgba(35, 55, 255, 0.1), transparent 60%),
-      linear-gradient(180deg, #ffffff 0%, #f7f9ff 100%);
-    border: 1px solid rgba(183, 199, 247, 0.7);
-    border-radius: 28px;
-    box-shadow:
-      0 18px 34px rgba(38, 66, 156, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
-  .group-pill img {
-    width: 100%;
-    max-width: 300px;
-    height: auto;
-    border-radius: 12px;
-    filter: drop-shadow(0 14px 24px rgba(35, 55, 255, 0.12));
-  }
-
-  .group-name {
-    color: #324488;
-    font-weight: 700;
-    font-size: 0.98rem;
-    text-align: center;
-    letter-spacing: 0.02em;
   }
 
   .talks-list {
@@ -352,16 +286,8 @@ const recordings: Recording[] = [
 
   @media (max-width: 720px) {
     .group-list {
+      grid-template-columns: 1fr;
       gap: 1.5rem;
-    }
-
-    .group-image-frame {
-      min-height: 190px;
-      border-radius: 22px;
-    }
-
-    .group-pill img {
-      max-width: 260px;
     }
 
     .talks-list {
@@ -375,6 +301,10 @@ const recordings: Recording[] = [
   }
 
   @media (max-width: 1024px) and (min-width: 721px) {
+    .group-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .talks-list {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
