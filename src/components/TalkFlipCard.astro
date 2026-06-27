@@ -8,6 +8,7 @@ interface Props {
   location: string;
   href: string;
   linkLabel?: string;
+  meetupCard?: boolean;
 }
 
 const {
@@ -19,13 +20,30 @@ const {
   location,
   href,
   linkLabel = "View Event",
+  meetupCard = true,
 } = Astro.props;
 ---
 
 <li class="talk-flip-wrapper">
   <div class="talk-flip-inner">
-    <div class="talk-face talk-front">
-      <img src={imageSrc}/>
+    <div class={`talk-face talk-front${meetupCard ? "" : " talk-front-poster"}`}>
+      {meetupCard ? (
+        <img src={imageSrc} alt={title} />
+      ) : (
+        <>
+          <div class="talk-poster-frame">
+            <img src={imageSrc} alt={title} />
+          </div>
+          <div class="talk-poster-footer">
+            <span class="talk-poster-event">{event}</span>
+            <h3 class="talk-poster-title">{title}</h3>
+            <div class="talk-poster-meta">
+              <span class="talk-date">{date}</span>
+              <span class="talk-location">{location}</span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
     <div class="talk-face talk-back">
       <span class="talk-event">{event}</span>
@@ -83,6 +101,71 @@ const {
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  .talk-front-poster {
+    display: flex;
+    flex-direction: column;
+    background: #0d1b2a;
+  }
+
+  .talk-poster-frame {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    background: #0d1b2a;
+    overflow: hidden;
+  }
+
+  .talk-front-poster .talk-poster-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .talk-poster-footer {
+    flex: 0 0 auto;
+    padding: 0.75rem 0.9rem 0.9rem;
+    background: linear-gradient(180deg, rgba(13, 27, 42, 0.95) 0%, #0b1726 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+  }
+
+  .talk-poster-event {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #60a5fa;
+  }
+
+  .talk-poster-title {
+    margin: 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .talk-poster-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .talk-poster-meta .talk-date,
+  .talk-poster-meta .talk-location {
+    font-size: 0.7rem;
+    color: #93c5fd;
   }
 
   .talk-back {
