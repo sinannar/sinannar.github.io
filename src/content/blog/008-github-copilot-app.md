@@ -49,4 +49,8 @@ I'm not replacing my other tools — they all have their purposes. VS Code and C
 
 The Copilot App is a solid addition to the toolkit. It's not a replacement for VS Code, CLI, or the cloud agent — but for a day of focused maintenance work across multiple repos, it made the process smooth. I'll keep experimenting with it.
 
-Check out the results: run `npx snnr`, visit my [profile](https://github.com/sinannar), or keep browsing this site. 🚀
+Check out the results:
+
+- Run `npx snnr` in your terminal to see my CLI resume
+- Visit my [GitHub profile](https://github.com/sinannar) to see the redesigned README
+- And you're already on [sinannar.github.io](https://sinannar.github.io) reading this post 🚀
