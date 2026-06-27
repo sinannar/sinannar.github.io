@@ -2,76 +2,106 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import MvpBadge from '../components/MvpBadge.astro';
 import { SITE_TITLE } from '../consts';
+
+interface Cert {
+	name: string;
+	issued: string;
+	image: string;
+	fallback?: string;
+}
+
+const certs: Cert[] = [
+	{ name: 'Microsoft Certified: AI Fundamentals', issued: 'June 2025', image: '/certifications/microsoft-certified-fundamentals-badge.svg', fallback: '/blog-placeholder-2.jpg' },
+	{ name: 'GitHub Copilot', issued: 'May 2025', image: '/certifications/githubcopilot.png', fallback: '/blog-placeholder-2.jpg' },
+	{ name: 'MongoDB Associate Developer', issued: 'Nov 2024', image: '/certifications/mongocert.png', fallback: '/blog-placeholder-2.jpg' },
+	{ name: 'Microsoft Certified: Azure AI Engineer Associate', issued: 'Jun 2024', image: '/certifications/microsoft-certified-associate-badge.svg', fallback: '/blog-placeholder-1.jpg' },
+	{ name: 'Microsoft Certified: Azure Solutions Architect Expert', issued: 'Mar 2023', image: '/certifications/microsoft-certified-azure-solutions-architect-expert.png' },
+	{ name: 'Microsoft Certified: DevOps Engineer Expert', issued: 'Dec 2022', image: '/certifications/microsoft-certified-devops-engineer-expert.png' },
+	{ name: 'Microsoft Certified: Azure Developer Associate', issued: 'Mar 2022', image: '/certifications/microsoft-certified-azure-developer-associate.1.png' },
+	{ name: 'Microsoft Certified: Azure Administrator Associate', issued: 'Feb 2022', image: '/certifications/microsoft-certified-azure-administrator-associate.2.png' },
+	{ name: 'Microsoft Certified: Azure Fundamentals', issued: 'Jul 2020', image: '/certifications/microsoft-certified-azure-fundamentals.png' },
+	{ name: 'Microsoft Certified Solutions Developer: App Builder', issued: 'Aug 2019', image: '/certifications/mcsd-app-builder-certified-2019.png' },
+	{ name: 'Microsoft Certified Solutions Associate: Web Applications', issued: 'Mar 2019', image: '/certifications/mcsa-web-applications-certified-2019.png' },
+	{ name: 'Microsoft Certified Professional', issued: 'Sep 2018', image: '/certifications/microsoft-certified-general-badge.svg', fallback: '/blog-placeholder-3.jpg' },
+];
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <BaseHead title={`Certifications | ${SITE_TITLE}`} description="Certifications of Sinan Nar" />
-  </head>
-  <body>
-    <Header />
-    <main>
-      <section style="max-width:700px;margin:2rem auto 2rem auto;">
-        <h1 style="font-size:2rem; margin-bottom:1.5rem;">Certifications</h1>
-        <ul style="font-size:1.1rem;line-height:2.2;list-style:none;padding:0;">
+	<head>
+		<BaseHead title={`Certifications | ${SITE_TITLE}`} description="Certifications and awards held by Sinan Nar." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="section">
+				<p class="eyebrow">~/certifications $ ls -1</p>
+				<h1>Certifications &amp; awards</h1>
+				<p class="muted">Microsoft, GitHub, MongoDB — and a Microsoft MVP recognition I'm proud of.</p>
+			</section>
 
+			<section class="section">
+				<p class="eyebrow">~/awards $ cat ./mvp.json</p>
+				<MvpBadge variant="block" />
+			</section>
 
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-fundamentals-badge.svg" alt="Microsoft Certified: AI Fundamentals" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" onerror="this.onerror=null;this.src='/blog-placeholder-2.jpg';" />
-            <span><strong>Microsoft Certified: AI Fundamentals</strong> <span style="color:#888;">— June 2025</span></span>
-          </li>
-
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/githubcopilot.png" alt="GitHub Copilot" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" onerror="this.onerror=null;this.src='/blog-placeholder-2.jpg';" />
-            <span><strong>GitHub Copilot</strong> <span style="color:#888;">— May 2025</span></span>
-          </li>
-
-
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/mongocert.png" alt="MongoDB Associate Developer" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" onerror="this.onerror=null;this.src='/blog-placeholder-2.jpg';" />
-            <span><strong>MongoDB Associate Developer</strong> <span style="color:#888;">— Nov 2024</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-associate-badge.svg" alt="Azure AI Engineer Associate" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" onerror="this.onerror=null;this.src='/blog-placeholder-1.jpg';" />
-            <span><strong>Microsoft Certified: Azure AI Engineer Associate</strong> <span style="color:#888;">— Jun 2024</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-azure-solutions-architect-expert.png" alt="Azure Solutions Architect Expert" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified: Azure Solution Architect Expert</strong> <span style="color:#888;">— Mar 2023</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-devops-engineer-expert.png" alt="DevOps Engineer Expert" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified: DevOps Engineer Expert</strong> <span style="color:#888;">— Dec 2022</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-azure-developer-associate.1.png" alt="Azure Developer Associate" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified: Azure Developer Associate</strong> <span style="color:#888;">— Mar 2022</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-azure-administrator-associate.2.png" alt="Azure Administrator Associate" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified: Azure Administrator Associate</strong> <span style="color:#888;">— Feb 2022</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-azure-fundamentals.png" alt="Azure Fundamentals" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified: Azure Fundamentals</strong> <span style="color:#888;">— Jul 2020</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/mcsd-app-builder-certified-2019.png" alt="MCSD App Builder" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified Solutions Developer: App Builder</strong> <span style="color:#888;">— Aug 2019</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/mcsa-web-applications-certified-2019.png" alt="MCSA Web Applications" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" />
-            <span><strong>Microsoft Certified Solutions Associate: Web Applications</strong> <span style="color:#888;">— Mar 2019</span></span>
-          </li>
-          <li style="display:flex;align-items:center;gap:0.7em;margin-bottom:0.7em;">
-            <img src="/certifications/microsoft-certified-general-badge.svg" alt="Microsoft Certified Professional" style="height:48px;width:auto;border-radius:6px;box-shadow:0 1px 4px #0001;" onerror="this.onerror=null;this.src='/blog-placeholder-3.jpg';" />
-            <span><strong>Microsoft Certified Professional</strong> <span style="color:#888;">— Sep 2018</span></span>
-          </li>
-        </ul>
-      </section>
-    </main>
-    <Footer />
-  </body>
+			<section class="section">
+				<p class="eyebrow">~/certifications $ tree</p>
+				<ul class="cert-grid">
+					{certs.map((cert) => (
+						<li class="cert">
+							<img
+								src={cert.image}
+								alt={cert.name}
+								loading="lazy"
+								onerror={cert.fallback ? `this.onerror=null;this.src='${cert.fallback}';` : undefined}
+							/>
+							<div>
+								<strong>{cert.name}</strong>
+								<span class="issued mono">{cert.issued}</span>
+							</div>
+						</li>
+					))}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
 </html>
+
+<style>
+	.cert-grid {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.85rem;
+	}
+	@media (max-width: 640px) { .cert-grid { grid-template-columns: 1fr; } }
+
+	.cert {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+		padding: 0.7rem 0.85rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		transition: border-color 120ms ease, transform 120ms ease;
+	}
+	.cert:hover { border-color: var(--accent); transform: translateY(-1px); }
+	.cert img {
+		width: 48px;
+		height: 48px;
+		object-fit: contain;
+		border-radius: var(--radius-sm);
+		background: var(--surface-2);
+		padding: 4px;
+		border: 1px solid var(--border);
+	}
+	.cert strong { display: block; line-height: 1.25; }
+	.issued { color: var(--text-muted); font-size: 0.82rem; }
+</style>

@@ -1,0 +1,62 @@
+---
+import { MVP_URL, MVP_LABEL } from '../consts';
+
+interface Props {
+	variant?: 'inline' | 'block';
+	label?: string;
+}
+
+const { variant = 'inline', label = MVP_LABEL } = Astro.props;
+---
+
+{variant === 'inline' ? (
+	<a class="chip mvp" href={MVP_URL} target="_blank" rel="noopener noreferrer" title="View MVP profile">
+		<span class="dot" aria-hidden="true"></span>
+		{label}
+	</a>
+) : (
+	<a class="mvp-block" href={MVP_URL} target="_blank" rel="noopener noreferrer">
+		<span class="mvp-glyph" aria-hidden="true">★</span>
+		<span class="mvp-text">
+			<span class="mvp-title">Microsoft MVP</span>
+			<span class="mvp-sub">Developer Technologies · 2026</span>
+		</span>
+		<span class="mvp-arrow" aria-hidden="true">→</span>
+	</a>
+)}
+
+<style>
+	.mvp-block {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.85rem;
+		padding: 0.7rem 1rem;
+		background: var(--mvp-soft);
+		border: 1px solid var(--mvp);
+		border-radius: var(--radius);
+		color: var(--text);
+		text-decoration: none;
+		font-family: var(--font-mono);
+		transition: transform 120ms ease, box-shadow 120ms ease;
+	}
+	.mvp-block:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 0 0 1px var(--mvp), 0 0 24px var(--mvp-soft);
+		text-decoration: none;
+	}
+	.mvp-glyph {
+		display: grid;
+		place-items: center;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		background: var(--mvp);
+		color: var(--bg);
+		font-size: 1rem;
+	}
+	.mvp-text { display: flex; flex-direction: column; line-height: 1.2; }
+	.mvp-title { font-weight: 700; color: var(--mvp); }
+	.mvp-sub { font-size: 0.78rem; color: var(--text-muted); }
+	.mvp-arrow { color: var(--mvp); transition: transform 120ms ease; }
+	.mvp-block:hover .mvp-arrow { transform: translateX(3px); }
+</style>

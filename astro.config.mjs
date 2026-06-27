@@ -8,4 +8,14 @@ export default defineConfig({
   site: 'https://sinannar.github.io',
   base: '/',
   outDir: 'dist',
+  integrations: [mdx(), sitemap()],
+  markdown: {
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark-dimmed',
+      },
+      wrap: true,
+    },
+  },
 });

@@ -1,8 +1,26 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import TerminalWindow from '../components/TerminalWindow.astro';
+import MvpBadge from '../components/MvpBadge.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_TAGLINE } from '../consts';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+	.filter((p) => !p.id.startsWith('unused/'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 4);
+
+const skills = [
+	{ group: '.NET & C#', items: ['.NET 6+', '.NET Aspire', 'ASP.NET', 'EF Core'] },
+	{ group: 'Azure', items: ['App Services', 'Functions', 'Container Apps', 'AKS', 'Service Bus', 'KeyVault'] },
+	{ group: 'Frontend', items: ['TypeScript', 'Angular', 'Ionic', 'Node.js'] },
+	{ group: 'DevOps', items: ['GitHub Actions', 'Azure DevOps', 'Terraform', 'Docker', 'Kubernetes'] },
+	{ group: 'Data', items: ['MSSQL', 'PostgreSQL', 'CosmosDB', 'MongoDB'] },
+	{ group: 'Observability', items: ['Datadog', 'Azure Monitor', 'App Insights'] },
+];
 ---
 
 <!doctype html>
@@ -11,79 +29,152 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<script type="text/javascript">
 			(function (c, l, a, r, i, t, y) {
-				c[a] =
-					c[a] ||
-					function () {
-						(c[a].q = c[a].q || []).push(arguments);
-					};
-				t = l.createElement(r);
-				t.async = 1;
-				t.src = "https://www.clarity.ms/tag/" + i;
-				y = l.getElementsByTagName(r)[0];
-				y.parentNode.insertBefore(t, y);
-			})(window, document, "clarity", "script", "s5jfnsazxg");
+				c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+				t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+				y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+			})(window, document, 'clarity', 'script', 's5jfnsazxg');
 		</script>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<section style="margin-bottom: 2rem;">
-				<h1 style="font-size:2.5rem; margin-bottom:0.5rem;">
-					Sinan Nar
-				</h1>
-				<h2
-					style="font-size:1.5rem; color: #666; margin-bottom:1.5rem;"
-				>
-					Senior Software Engineer & Technical Leader
-				</h2>
-				<p style="max-width: 700px;">
-					I am a Consultant who focuses on an Apps and AI. I am working at ARINCO which is Microsoft and GitHub partner consultancy. I co-organise the Aotearoa Azure User Group and the Auckland .NET User Group. I am an experienced and certified software engineer, specialise in the Microsoft ecosystem, with a focus on Azure and GitHub.
-				</p>
-				<!-- Social/contact links moved to Header and Footer -->
-				<hr style="margin:2rem 0;" />
-				<div
-					style="display: flex; flex-wrap: wrap; gap: 2rem; margin-bottom: 2rem;"
-				>
-					<div style="flex: 1 1 250px; min-width: 220px;">
-						<h3>What I Work With</h3>
-						<p style="margin: 0 0 0.5em 0;">
-							.NET (Core & 6+), C#, JavaScript, TypeScript,
-							Angular, Ionic, Node.js
-						</p>
-						<p style="margin: 0 0 0.5em 0;">
-							Kubernetes, Docker, Azure (App Services, Functions,
-							Service Bus, AKS, Container Apps, KeyVault)
-						</p>
-						<p style="margin: 0 0 0.5em 0;">
-							CI/CD (GitHub Actions, Azure DevOps), Terraform,
-							Integration Testing, TDD, BDD
-						</p>
-						<p style="margin: 0 0 0.5em 0;">
-							SQL (MSSQL, PostgreSQL, MySQL), MongoDB, CosmosDB,
-							Datadog, Azure Monitor
-						</p>
+			<!-- Hero -->
+			<section class="hero">
+				<TerminalWindow title="sinannar@nz:~">
+					<p class="hero-line"><span class="prompt">whoami</span></p>
+					<h1 class="hero-name">Sinan Nar<span class="caret" aria-hidden="true"></span></h1>
+					<p class="hero-tagline mono">{SITE_TAGLINE}</p>
+					<p class="hero-bio">
+						Consultant focused on Apps and AI. Working at <a href="https://arinco.com.au" target="_blank" rel="noopener">ARINCO</a>,
+						a Microsoft and GitHub partner consultancy. I co-organise the Aotearoa Azure Meetup, the
+						Auckland .NET User Group, and the Aotearoa NZ GitHub User Group — and I'm an experienced,
+						certified software engineer in the Microsoft ecosystem with a focus on Azure and GitHub.
+					</p>
+
+					<div class="hero-mvp">
+						<MvpBadge variant="block" />
 					</div>
-					<div style="flex: 1 1 250px; min-width: 220px;">
-						<h3>How I Work</h3>
-						<ul style="margin: 0; padding-left: 1.2em;">
-							<li>
-								Clear, friendly communication with all
-								stakeholders
-							</li>
-							<li>Collaborative and supportive team player</li>
-							<li>Mentor and coach for junior developers</li>
-							<li>Proactive problem solver and decision maker</li>
-							<li>Strong time management and prioritization</li>
-							<li>Always learning and sharing knowledge</li>
-						</ul>
+
+					<div class="hero-actions">
+						<a class="btn primary" href="/blog">read the blog →</a>
+						<a class="btn" href="/speaking">see talks</a>
+						<a class="btn" href="/experience">experience</a>
 					</div>
+				</TerminalWindow>
+			</section>
+
+			<!-- Stack -->
+			<section class="section">
+				<p class="eyebrow">~/ $ cat stack.txt</p>
+				<div class="grid stack-grid">
+					{skills.map((s) => (
+						<TerminalWindow title={s.group}>
+							<ul class="tag-list">
+								{s.items.map((i) => <li class="tag">{i}</li>)}
+							</ul>
+						</TerminalWindow>
+					))}
 				</div>
 			</section>
-			<section>
-				<a href="/blog" style="font-size:1.2rem;">Read my Blog &rarr;</a
-				>
+
+			<!-- Recent posts -->
+			<section class="section">
+				<div class="section-head">
+					<p class="eyebrow">~/blog $ ls -t | head -4</p>
+					<a class="link-more" href="/blog">view all →</a>
+				</div>
+				<ul class="post-list">
+					{posts.map((post) => (
+						<li>
+							<a class="post-row" href={`/blog/${post.id}/`}>
+								<span class="post-prompt" aria-hidden="true">❯</span>
+								<span class="post-title">{post.data.title}</span>
+								<span class="post-date mono"><FormattedDate date={post.data.pubDate} /></span>
+							</a>
+						</li>
+					))}
+				</ul>
 			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.hero { margin-top: 1.5rem; }
+	.hero-line { margin: 0 0 0.6rem; }
+	.hero-name {
+		margin: 0.2rem 0 0.4rem;
+		font-size: clamp(2rem, 3vw + 1rem, 3rem);
+		letter-spacing: -0.01em;
+	}
+	.hero-tagline { color: var(--text-muted); margin: 0 0 1rem; }
+	.hero-bio { max-width: 64ch; }
+	.hero-mvp { margin: 1.25rem 0 1.5rem; }
+	.hero-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+	.grid { display: grid; gap: 1rem; }
+	.stack-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	@media (max-width: 900px) { .stack-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+	@media (max-width: 560px) { .stack-grid { grid-template-columns: 1fr; } }
+
+	.tag-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.2rem 0.55rem;
+		font-family: var(--font-mono);
+		font-size: 0.82rem;
+		color: var(--text);
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: 999px;
+	}
+
+	.section-head {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+	}
+	.link-more {
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+	}
+	.post-list { list-style: none; padding: 0; margin: 0; }
+	.post-row {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: baseline;
+		gap: 0.7rem;
+		padding: 0.7rem 0.85rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface);
+		color: var(--text);
+		text-decoration: none;
+		margin-bottom: 0.5rem;
+		transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
+	}
+	.post-row:hover {
+		border-color: var(--accent);
+		background: var(--surface-2);
+		text-decoration: none;
+		transform: translateX(2px);
+	}
+	.post-prompt { color: var(--prompt); font-family: var(--font-mono); }
+	.post-title { color: var(--text); }
+	.post-date { color: var(--text-muted); font-size: 0.85rem; }
+	@media (max-width: 560px) {
+		.post-row { grid-template-columns: auto 1fr; }
+		.post-date { grid-column: 1 / -1; padding-left: 1.6rem; }
+	}
+</style>

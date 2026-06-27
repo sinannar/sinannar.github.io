@@ -1,0 +1,36 @@
+---
+interface Props {
+	title?: string;
+	prompt?: string;
+	class?: string;
+}
+
+const { title, prompt, class: className } = Astro.props;
+---
+
+<section class:list={["terminal", className]}>
+	<header class="terminal-bar">
+		<span class="terminal-dots" aria-hidden="true">
+			<span class="terminal-dot red"></span>
+			<span class="terminal-dot yellow"></span>
+			<span class="terminal-dot green"></span>
+		</span>
+		{title && <span class="terminal-bar-title">{title}</span>}
+	</header>
+	<div class="terminal-body">
+		{prompt && <p class="terminal-prompt"><span class="prompt">{prompt}</span></p>}
+		<slot />
+	</div>
+</section>
+
+<style>
+	.terminal-bar-title {
+		flex: 1;
+		text-align: center;
+		color: var(--text-muted);
+	}
+	.terminal-prompt {
+		margin: 0 0 1rem;
+		font-size: 0.95rem;
+	}
+</style>

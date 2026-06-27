@@ -9,16 +9,46 @@ const subpath = pathname.match(/[^\/]+/g);
 const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 ---
 
-<a href={href} class:list={[className, { active: isActive }]} {...props}>
+<a href={href} class:list={[className, { active: isActive }]} aria-current={isActive ? 'page' : undefined} {...props}>
+	<span class="hl-marker" aria-hidden="true">❯</span>
 	<slot />
 </a>
 <style>
 	a {
-		display: inline-block;
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.35rem 0.55rem;
+		font-family: var(--font-mono);
+		font-size: 0.92rem;
+		color: var(--text-muted);
+		text-decoration: none;
+		border-radius: var(--radius-sm);
+		transition: color 120ms ease, background 120ms ease;
+	}
+	a .hl-marker {
+		opacity: 0;
+		color: var(--prompt);
+		transition: opacity 120ms ease, transform 120ms ease;
+		transform: translateX(-2px);
+	}
+	a:hover {
+		color: var(--text);
+		background: var(--surface-2);
 		text-decoration: none;
 	}
+	a:hover .hl-marker {
+		opacity: 1;
+		transform: translateX(0);
+	}
 	a.active {
-		font-weight: bolder;
-		text-decoration: underline;
+		color: var(--text);
+		background: var(--surface-2);
+	}
+	a.active .hl-marker {
+		opacity: 1;
+		color: var(--accent);
+		transform: translateX(0);
 	}
 </style>
