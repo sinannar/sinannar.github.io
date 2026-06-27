@@ -1,91 +1,51 @@
 ---
 title: 'Building My GitHub Presence with Copilot App'
-description: 'How I used GitHub Copilot App to manage and update my personal GitHub ecosystem'
+description: 'How I combined Copilot CLI, VS Code, Cloud Agent, and the Copilot App to update my personal GitHub ecosystem'
 pubDate: 'June 27 2026'
 heroImage: '/008-github-copilot-app.png'
 ---
 
 ### Intro
 
-I have been using GitHub Copilot in my editor for a while now, but recently I started using the **GitHub Copilot App** — a dedicated desktop application that takes a different approach to AI-assisted development. Instead of inline suggestions while you type, it gives you a session-based workspace where you can have conversations about your code, delegate tasks, and manage multiple repositories simultaneously.
+I've been using GitHub Copilot across multiple surfaces for a while — **Copilot in VS Code** for inline completions, **Copilot CLI** for terminal commands, and the **Copilot Cloud Agent** for autonomous PRs. Recently I added the **GitHub Copilot App** to the mix, and used all of them together to overhaul my personal GitHub ecosystem:
 
-In this post, I'll share how I used it to overhaul my personal GitHub ecosystem across three repositories:
-
-- [**sinannar.github.io**](https://github.com/sinannar/sinannar.github.io) — my personal website (the one you're reading right now)
+- [**sinannar.github.io**](https://github.com/sinannar/sinannar.github.io) — this personal website
 - [**sinannar**](https://github.com/sinannar/sinannar) — my GitHub profile README
-- [**snnr**](https://github.com/sinannar/snnr) — my npm package that you can run with `npx snnr`
+- [**snnr**](https://github.com/sinannar/snnr) — my npm package (`npx snnr`)
 
-### What is the Copilot App?
+### The Copilot App
 
-The Copilot App is a standalone application that connects directly to your GitHub repositories. It creates isolated worktree-backed sessions for each task, so you can work on multiple things in parallel without branch conflicts. Think of it as having a team of developers, each working on their own feature branch, but it's just you and the AI.
+The Copilot App is a standalone desktop application where you work in session-based workspaces. Each session gets its own git worktree and branch, so you can run multiple tasks in parallel without conflicts. You describe what you want, the AI implements it, runs the build, and commits.
 
-The key concepts are:
+Here's what my sidebar looked like:
 
-- **Projects** — linked to your GitHub repositories
-- **Sessions** — isolated workspaces with their own branches, each focused on a specific task
-- **Worktrees** — git worktrees that allow parallel development without switching branches
+**snnr**: NPM publish workflow · Update CLI resume · Update readme
 
-### My Workflow
+**sinannar**: Redesign readme · Refresh profile readme
 
-Here's what my sidebar looked like while working across all three repositories:
+**sinannar.github.io**: Update certifications · Modernize blog design · Updating organiser and talks
 
-**snnr** (npm package):
-- NPM publish workflow — setting up automated publishing via GitHub Actions
-- Update CLI resume — refreshing the content that shows when you run `npx snnr`
-- Update readme — improving documentation for the package
+### How I Combined the Tools
 
-**sinannar** (GitHub profile):
-- Redesign readme — giving my profile a fresh look
-- Refresh profile readme — updating the content and stats
+I didn't use just one Copilot surface — I used whichever fit the moment:
 
-**sinannar.github.io** (personal website):
-- Update certifications — adding my latest certifications
-- Modernize blog design — refreshing the look and feel of this blog
-- Updating organiser and talks — adding recent meetup and conference info
+- **Copilot CLI** — quick git commands, checking build outputs, running `npx snnr` to verify changes
+- **Copilot in VS Code** — fine-tuning code where I needed precise control, reviewing diffs before merging
+- **Copilot Cloud Agent** — kicked off for larger autonomous tasks like setting up the NPM publish GitHub Action
+- **Copilot App** — the hub for managing sessions, delegating tasks, and working across repos without context-switching overhead
 
-### How Sessions Work
-
-Each session is a self-contained unit of work. When I opened "Modernize blog design", the app created a new git worktree with its own branch, separate from the other sessions. I could describe what I wanted — a cleaner layout, better typography, improved mobile responsiveness — and the AI would implement the changes, run the build to verify nothing broke, and commit the work.
-
-What I found powerful was the ability to context-switch between sessions without losing progress. While waiting for one session to finish a build or test run, I could jump to another repository entirely and work on something else. The app keeps track of everything.
-
-### The Multi-Repo Advantage
-
-Managing a personal GitHub presence involves keeping multiple repositories in sync. My profile README references my website, my website links to my npm package, and the npm package CLI displays info that should match both. Before the Copilot App, updating all three meant:
-
-1. Clone/pull each repo
-2. Switch to a new branch
-3. Make changes
-4. Test locally
-5. Commit and push
-6. Create PRs
-7. Repeat for the next repo
-
-With the Copilot App, I could open sessions across all three projects and work on them concurrently. The AI handles the git operations, branch management, and even creates the pull requests for me.
+The app shines for delegation. Things like "add my latest Azure certification" or "modernize the blog layout" — I'd describe the task, let it work, then review the PR. Meanwhile I could switch to another session or jump into VS Code for something that needed my hands on the keyboard.
 
 ### What Worked Well
 
-**Delegation of routine tasks** — Things like updating a README badge, fixing a typo in the CLI output, or adding a new certification to a list don't require creative thinking. I could describe the task in natural language and let the AI handle it.
+**Session isolation** — each task lives in its own branch. No half-finished work leaking into other changes.
 
-**Consistency across repos** — When I updated my job title or added a new certification, I could tell each session about the change and it would update the relevant files in each repository consistently.
+**Build verification** — the app runs your builds and tests automatically. When I changed the blog layout, it verified the Astro site still compiled.
 
-**The worktree model** — Having isolated branches for each task meant I never had to worry about half-finished work conflicting with other changes. Each session produced a clean PR that I could review independently.
-
-**Build verification** — The app doesn't just write code; it runs your builds and tests to make sure things actually work. When I changed the blog layout, it ran `npm run build` to verify the Astro site still compiled correctly.
-
-### What I Learned
-
-The Copilot App works best when you treat it like delegating to a junior developer — be clear about what you want, provide context, and review the output. It's not magic, but it removes a lot of friction from routine development tasks.
-
-For personal projects especially, where motivation to do boring maintenance tasks is low, having an AI assistant that can handle the tedious parts while you focus on the creative decisions is genuinely useful.
+**Low-effort maintenance** — personal projects suffer from "I'll update that later" syndrome. Having AI handle the tedious bits (README badges, certification lists, CLI output) means they actually get done.
 
 ### Conclusion
 
-If you maintain multiple GitHub repositories — especially interconnected ones like a personal website, profile, and packages — the Copilot App is worth trying. The session-based workflow with isolated branches makes it easy to parallelize work that would otherwise be sequential and tedious.
+The combination of Copilot CLI + VS Code + Cloud Agent + the App covers the full spectrum — from quick terminal one-liners to autonomous multi-file PRs. For maintaining a personal GitHub presence across multiple repos, it's been genuinely useful.
 
-You can check out the results:
-- Run `npx snnr` in your terminal to see my CLI resume
-- Visit my [GitHub profile](https://github.com/sinannar) to see the redesigned README
-- And you're already on my [personal site](https://sinannar.github.io) reading this post
-
-Happy coding! 🚀
+Check out the results: run `npx snnr`, visit my [profile](https://github.com/sinannar), or keep browsing this site. 🚀
