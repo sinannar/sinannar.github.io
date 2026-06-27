@@ -245,21 +245,18 @@ const organizerGroups = [
   <body>
     <Header />
     <main>
-      <section style="max-width: 900px; margin: 2rem auto;">
-        <h1
-          style="font-size:2.2rem; margin-bottom:1.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.5rem;"
-        >
-          Public Speaking &amp; Meetups
-        </h1>
+      <section class="section page-section">
+        <p class="eyebrow">~/speaking $ ls -1</p>
+        <h1>Public speaking &amp; meetups</h1>
+        <p class="muted">Talks I've given and groups I help organise across Aotearoa.</p>
 
-        <!-- Speaking Engagements -->
-        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Public Speakings</h2>
+        <h2 class="section-title">Talks</h2>
 
         <ul class="talks-list">
           {talks.map((talk) => <TalkFlipCard {...talk} />)}
         </ul>
 
-        <h2 style="font-size:1.5rem; margin-bottom:1rem;">YouTube Recordings</h2>
+        <h2 class="section-title">YouTube recordings</h2>
 
         {
           recordings.length > 0 ? (
@@ -275,7 +272,7 @@ const organizerGroups = [
       
 
         <!-- Organiser Groups -->
-        <h2 style="font-size:1.5rem; margin-bottom:1rem;">Organizer for</h2>
+        <h2 class="section-title">Organiser for</h2>
 
         <ul class="group-list">
           {organizerGroups.map((group) => <OrganizerCard {...group} />)}
@@ -287,13 +284,23 @@ const organizerGroups = [
 </html>
 
 <style>
+  .page-section { max-width: 980px; margin: 0 auto; }
+  .section-title {
+    font-family: var(--font-mono);
+    font-size: 1.25rem;
+    margin: 2rem 0 1rem;
+    color: var(--text);
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 0.5rem;
+  }
+
   .page-warning {
     margin: 0 0 1.5rem;
     padding: 0.75rem 0.95rem;
     border-radius: 10px;
-    border: 1px solid #facc15;
-    background: #fffbeb;
-    color: #854d0e;
+    border: 1px solid var(--yellow);
+    background: var(--surface-2);
+    color: var(--text);
     font-size: 0.95rem;
     font-weight: 600;
   }
@@ -303,7 +310,7 @@ const organizerGroups = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2rem;
+    gap: 1.25rem;
     margin-bottom: 2.5rem;
   }
 
@@ -312,7 +319,7 @@ const organizerGroups = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2rem;
+    gap: 1.25rem;
     margin-bottom: 2.5rem;
   }
 
@@ -321,47 +328,29 @@ const organizerGroups = [
     padding: 0;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2rem;
+    gap: 1.25rem;
     margin-bottom: 2.5rem;
   }
 
   .section-empty-state {
     margin: 0 0 2.5rem;
     padding: 1rem 1.1rem;
-    border: 1px dashed rgba(148, 163, 184, 0.9);
-    border-radius: 16px;
-    background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
-    color: #475569;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text-muted);
     font-size: 0.95rem;
   }
 
   @media (max-width: 720px) {
-    .group-list {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .talks-list {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .recordings-list {
-      grid-template-columns: 1fr;
-    }
+    .group-list,
+    .talks-list { grid-template-columns: 1fr; gap: 1rem; }
+    .recordings-list { grid-template-columns: 1fr; }
   }
 
   @media (max-width: 1024px) and (min-width: 721px) {
-    .group-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .talks-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .recordings-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .group-list,
+    .talks-list,
+    .recordings-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 </style>

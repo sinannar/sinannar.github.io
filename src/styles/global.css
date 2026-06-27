@@ -1,144 +1,411 @@
 /*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
- */
+  Global styles — terminal / TUI aesthetic.
+  Dark "terminal" theme is the default; light "paper" theme via [data-theme="light"].
+*/
 
-:root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
+:root,
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--bg: #0d1117;
+	--bg-elev: #0f1622;
+	--surface: #161b22;
+	--surface-2: #1c2230;
+	--border: #30363d;
+	--border-strong: #3d444d;
+	--text: #e6edf3;
+	--text-muted: #8b949e;
+	--text-faint: #6e7681;
+	--prompt: #3fb950;
+	--accent: #58a6ff;
+	--accent-soft: rgba(88, 166, 255, 0.16);
+	--magenta: #d2a8ff;
+	--yellow: #f7c948;
+	--orange: #ff9b6e;
+	--mvp: #ff5b3a;
+	--mvp-soft: rgba(255, 91, 58, 0.16);
+	--selection: rgba(63, 185, 80, 0.32);
+	--shadow-1: 0 1px 0 rgba(255, 255, 255, 0.03), 0 8px 24px rgba(0, 0, 0, 0.55);
+	--shadow-2: 0 1px 0 rgba(255, 255, 255, 0.04), 0 16px 48px rgba(0, 0, 0, 0.65);
+	--glow: 0 0 0 1px rgba(88, 166, 255, 0.25), 0 0 24px rgba(88, 166, 255, 0.18);
+	--ring: 0 0 0 2px rgba(63, 185, 80, 0.6);
+
+	--radius: 10px;
+	--radius-lg: 14px;
+	--radius-sm: 6px;
+
+	--font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+	--font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+	--max-page: 1080px;
+	--max-content: 760px;
+
+	color: var(--text);
+	background: var(--bg);
 }
-@font-face {
-	font-family: 'Atkinson';
-	src: url('/fonts/atkinson-regular.woff') format('woff');
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
+
+:root[data-theme='light'] {
+	color-scheme: light;
+	--bg: #fafafa;
+	--bg-elev: #ffffff;
+	--surface: #ffffff;
+	--surface-2: #f4f6fa;
+	--border: #d0d7de;
+	--border-strong: #b6becc;
+	--text: #1f2328;
+	--text-muted: #57606a;
+	--text-faint: #6e7781;
+	--prompt: #1a7f37;
+	--accent: #0969da;
+	--accent-soft: rgba(9, 105, 218, 0.12);
+	--magenta: #8250df;
+	--yellow: #9a6700;
+	--orange: #bc4c00;
+	--mvp: #bf3917;
+	--mvp-soft: rgba(191, 57, 23, 0.12);
+	--selection: rgba(26, 127, 55, 0.22);
+	--shadow-1: 0 1px 0 rgba(15, 23, 42, 0.04), 0 8px 20px rgba(15, 23, 42, 0.08);
+	--shadow-2: 0 2px 0 rgba(15, 23, 42, 0.05), 0 18px 36px rgba(15, 23, 42, 0.12);
+	--glow: 0 0 0 1px rgba(9, 105, 218, 0.22), 0 0 24px rgba(9, 105, 218, 0.15);
+	--ring: 0 0 0 2px rgba(26, 127, 55, 0.45);
 }
-@font-face {
-	font-family: 'Atkinson';
-	src: url('/fonts/atkinson-bold.woff') format('woff');
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap;
+
+/* No-FOUC: respected via inline script in BaseHead */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
 }
+
+html {
+	scroll-behavior: smooth;
+}
+
 body {
-	font-family: 'Atkinson', sans-serif;
 	margin: 0;
 	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
+	min-height: 100vh;
+	background:
+		radial-gradient(1200px 600px at 50% -200px, var(--accent-soft), transparent 60%),
+		var(--bg);
+	color: var(--text);
+	font-family: var(--font-sans);
+	font-size: 17px;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 18px;
-	line-height: 1.7;
 }
-main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+
+::selection {
+	background: var(--selection);
+	color: var(--text);
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
-}
-h1 {
-	font-size: 2.5em;
-}
-h2 {
-	font-size: 2em;
-}
-h3 {
-	font-size: 1.6em;
-}
-h4 {
-	font-size: 1.4em;
-}
-h5 {
-	font-size: 1.1em;
-}
-h6 {
-	font-size: 0.8em;
-}
-strong,
-b {
-	font-weight: 700;
-}
+
 a {
 	color: var(--accent);
+	text-decoration: none;
+	text-underline-offset: 3px;
+	transition: color 120ms ease, text-decoration-color 120ms ease;
 }
 a:hover {
-	color: var(--accent);
+	text-decoration: underline;
+	text-decoration-color: var(--accent);
 }
-p {
-	margin-bottom: 1em;
+a:focus-visible,
+button:focus-visible,
+[tabindex]:focus-visible {
+	outline: none;
+	box-shadow: var(--ring);
+	border-radius: var(--radius-sm);
 }
-.prose p {
-	margin-bottom: 2em;
-}
-textarea {
+
+main {
 	width: 100%;
-	font-size: 16px;
+	max-width: var(--max-page);
+	margin: 0 auto;
+	padding: 2.5rem 1.25rem 4rem;
 }
-input {
-	font-size: 16px;
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--font-mono);
+	color: var(--text);
+	line-height: 1.2;
+	margin: 0 0 0.6em;
+	letter-spacing: -0.01em;
 }
-table {
-	width: 100%;
+h1 { font-size: clamp(1.9rem, 2.4vw + 1rem, 2.6rem); font-weight: 700; }
+h2 { font-size: clamp(1.4rem, 1.4vw + 1rem, 1.9rem); font-weight: 700; }
+h3 { font-size: 1.25rem; font-weight: 600; }
+h4 { font-size: 1.1rem; font-weight: 600; }
+h5 { font-size: 1rem; font-weight: 600; }
+h6 { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+p { margin: 0 0 1em; }
+strong, b { font-weight: 700; color: var(--text); }
+em, i { font-style: italic; }
+
+ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+li { margin: 0.25em 0; }
+
+hr {
+	border: none;
+	border-top: 1px dashed var(--border);
+	margin: 2rem 0;
 }
+
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 8px;
+	border-radius: var(--radius);
+	display: block;
 }
+
+/* Code */
 code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
+	font-family: var(--font-mono);
+	font-size: 0.92em;
+	padding: 0.15em 0.4em;
+	background: var(--surface-2);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	color: var(--text);
 }
 pre {
-	padding: 1.5em;
-	border-radius: 8px;
+	font-family: var(--font-mono);
+	font-size: 0.92em;
+	padding: 1.1rem 1.2rem;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	overflow-x: auto;
+	box-shadow: var(--shadow-1);
+	tab-size: 2;
 }
 pre > code {
 	all: unset;
+	font-family: inherit;
 }
-blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0px;
-	font-size: 1.333em;
+pre.astro-code {
+	background: var(--surface) !important;
 }
-hr {
-	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
-}
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
-	}
-	main {
-		padding: 1em;
-	}
+:root[data-theme='light'] pre.astro-code,
+:root[data-theme='light'] pre.astro-code span {
+	color: inherit;
 }
 
+/* Show the right Shiki theme per mode */
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+	color: var(--shiki-dark, inherit) !important;
+	background-color: var(--shiki-dark-bg, var(--surface)) !important;
+	font-style: var(--shiki-dark-font-style, inherit) !important;
+	font-weight: var(--shiki-dark-font-weight, inherit) !important;
+	text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+blockquote {
+	margin: 1.5rem 0;
+	padding: 0.6rem 1.1rem;
+	border-left: 3px solid var(--prompt);
+	background: var(--surface);
+	border-radius: 0 var(--radius) var(--radius) 0;
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1.5rem 0;
+	border: 1px solid var(--border);
+	border-radius: var(--radius);
+	overflow: hidden;
+	font-size: 0.95em;
+}
+th, td {
+	padding: 0.7em 0.9em;
+	text-align: left;
+	border-bottom: 1px solid var(--border);
+}
+th {
+	background: var(--surface-2);
+	font-family: var(--font-mono);
+	color: var(--text);
+}
+tr:last-child td { border-bottom: none; }
+
+input, textarea, button, select {
+	font-family: inherit;
+	font-size: 1rem;
+	color: inherit;
+}
+
+/* Scrollbar */
+* {
+	scrollbar-color: var(--border-strong) transparent;
+	scrollbar-width: thin;
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb {
+	background: var(--border-strong);
+	border-radius: 999px;
+}
+
+/* Terminal prompt accents */
+.prompt {
+	font-family: var(--font-mono);
+	color: var(--prompt);
+	font-weight: 700;
+}
+.prompt::before {
+	content: '❯ ';
+	color: var(--accent);
+}
+.caret {
+	display: inline-block;
+	width: 0.55ch;
+	height: 1em;
+	background: var(--prompt);
+	margin-left: 2px;
+	transform: translateY(2px);
+	animation: blink 1.05s steps(2, end) infinite;
+}
+@keyframes blink {
+	0%, 50% { opacity: 1; }
+	50.01%, 100% { opacity: 0; }
+}
+
+/* Section helpers */
+.section { margin: 2.5rem 0; }
+.eyebrow {
+	font-family: var(--font-mono);
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: var(--text-muted);
+	margin: 0 0 0.6em;
+}
+.muted { color: var(--text-muted); }
+.mono { font-family: var(--font-mono); }
+
+/* Prose container (used on blog posts) */
+.prose {
+	max-width: var(--max-content);
+	margin: 0 auto;
+}
+.prose p { margin-bottom: 1.15em; }
+.prose img {
+	margin: 1.25rem auto;
+	border-radius: var(--radius);
+	border: 1px solid var(--border);
+}
+.prose pre { margin: 1.25rem 0; max-height: 800px; }
+.prose h2 { margin-top: 2.2em; }
+.prose h3 { margin-top: 1.8em; }
+.prose a { color: var(--accent); }
+.prose ul, .prose ol { margin-bottom: 1.25em; }
+
+/* Generic terminal window card */
+.terminal {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-1);
+	overflow: hidden;
+}
+.terminal-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.55rem 0.85rem;
+	background: var(--surface-2);
+	border-bottom: 1px solid var(--border);
+	font-family: var(--font-mono);
+	font-size: 0.8rem;
+	color: var(--text-muted);
+}
+.terminal-dots {
+	display: inline-flex;
+	gap: 6px;
+	margin-right: 0.5rem;
+}
+.terminal-dot {
+	width: 11px;
+	height: 11px;
+	border-radius: 999px;
+	background: var(--border-strong);
+}
+.terminal-dot.red { background: #ff5f57; }
+.terminal-dot.yellow { background: #febc2e; }
+.terminal-dot.green { background: #28c840; }
+.terminal-body {
+	padding: 1.25rem 1.25rem 1.4rem;
+}
+.terminal-body p:last-child { margin-bottom: 0; }
+
+/* Pill / chip */
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.25rem 0.6rem;
+	font-family: var(--font-mono);
+	font-size: 0.78rem;
+	color: var(--text);
+	background: var(--surface-2);
+	border: 1px solid var(--border);
+	border-radius: 999px;
+}
+.chip.mvp {
+	color: var(--mvp);
+	background: var(--mvp-soft);
+	border-color: var(--mvp);
+}
+.chip .dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 999px;
+	background: currentColor;
+	box-shadow: 0 0 8px currentColor;
+}
+
+/* Buttons */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.55rem 0.95rem;
+	font-family: var(--font-mono);
+	font-size: 0.9rem;
+	color: var(--text);
+	background: var(--surface);
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius);
+	cursor: pointer;
+	transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+	text-decoration: none;
+}
+.btn:hover {
+	background: var(--surface-2);
+	border-color: var(--accent);
+	color: var(--text);
+	text-decoration: none;
+}
+.btn:active { transform: translateY(1px); }
+.btn.primary {
+	color: var(--bg);
+	background: var(--prompt);
+	border-color: var(--prompt);
+}
+.btn.primary:hover {
+	background: var(--prompt);
+	color: var(--bg);
+	filter: brightness(1.1);
+}
+
+/* Screen-reader only */
 .sr-only {
 	border: 0;
 	padding: 0;
@@ -147,59 +414,21 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
 }
 
-.prose pre {
-	max-height: 800px;
-	overflow-y: auto;
-	overflow-x: auto;
-	padding: 1.5em;
-	border-radius: 8px;
+/* Responsive */
+@media (max-width: 720px) {
+	body { font-size: 16px; }
+	main { padding: 1.5rem 1rem 3rem; }
 }
 
-
-table {
-	border: #000d8a solid;
-	border-radius: 20px;
-	border-width: 3px;
-	padding: 30px;
-
-	margin-top: 2rem;
-	margin-bottom: 2rem;
-
-	width: 160%;
-	max-width: 160%;
-	transform: translateX(-20%);
-}
-
-.hero-image img {
-	width: 250px;
-	height: auto;
-}
-
-li img {
-	width: 250px;
-	height: auto;
-}
-
-hr {
-	width: 160%;
-	max-width: 160%;
-	transform: translateX(-20%);
-
-	margin-top: 2rem;
-	margin-bottom: 2rem;
-
-	border: none;      /* remove default border */
-	height: 4px;       /* thickness */
-	background-color: #333; /* color of the line */
-	margin: 2rem auto; /* vertical spacing + center */
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.001ms !important;
+		transition-duration: 0.001ms !important;
+	}
 }

@@ -1,61 +1,33 @@
-# Astro Blog Project
+# sinannar.github.io
 
-This project is a personal blog built with [Astro](https://astro.build/), a modern static site generator. It features Markdown and MDX support, custom layouts, and a clean, accessible design.
+Personal site and blog of [Sinan Nar](https://sinannar.github.io) — **Microsoft MVP**, Senior Software Engineer, based in Auckland, NZ.
 
-## Project Structure
-- **src/**: Source files, including components, layouts, pages, and content.
-- **public/**: Static assets such as images and fonts.
-- **astro.config.mjs**: Astro configuration file.
-- **tsconfig.json**: TypeScript configuration.
-- **package.json**: Project dependencies and scripts.
+Built with [Astro](https://astro.build/). The site uses a terminal / TUI-inspired design with a dark-first theme (and a light "paper" theme toggle), JetBrains Mono headings and Inter body type, and Shiki for code highlighting.
 
-## Getting Started
+## Local development
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or newer recommended)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+Requires Node 18+.
 
-### Installation
-1. Clone the repository:
-   ```zsh
-   git clone <your-repo-url>
-   cd <project-directory>
-   ```
-2. Install dependencies:
-   ```zsh
-   npm install
-   # or
-   yarn install
-   ```
-
-### Running the Project Locally
-Start the development server:
-```zsh
-npm run dev
-# or
-yarn dev
-```
-The site will be available at `http://localhost:4321` by default.
-
-### Building for Production
-To build the static site:
-```zsh
-npm run build
-# or
-yarn build
-```
-The output will be in the `dist/` directory.
-
-### Previewing the Production Build
-```zsh
+```bash
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # static build -> ./dist
 npm run preview
-# or
-yarn preview
 ```
 
-## Learn More
-- [Astro Documentation](https://docs.astro.build/)
-- [Markdown Support](https://docs.astro.build/en/guides/markdown-content/)
+## Project layout
 
----
-Feel free to customize this README with more details about your blog, deployment instructions, or contribution guidelines.
+- `src/pages/` — routes (`index`, `about`, `experience`, `certifications`, `speaking`, `blog/`)
+- `src/layouts/BlogPost.astro` — blog post layout (sticky TOC on desktop)
+- `src/components/` — `Header`, `Footer`, `TerminalWindow`, `MvpBadge`, etc.
+- `src/styles/global.css` — design tokens + themes + terminal accents
+- `src/content/blog/` — Markdown / MDX posts
+- `public/` — static assets
+
+## Theming
+
+The theme is set via `data-theme` on the root element and persisted in `localStorage`. The toggle lives in the header. System preference (`prefers-color-scheme`) is honoured on first load.
+
+## License
+
+Content © Sinan Nar. Code is provided as-is.
