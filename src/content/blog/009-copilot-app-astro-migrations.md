@@ -110,6 +110,14 @@ In both repos, the first Markdown post became part of the migration story. Inste
 
 That is another workflow lesson for me: do not overload one AI session with every possible follow-up. Let the migration session migrate. Then use a smaller session for polish once the structure exists.
 
+### Using Orchestrate While Writing This Post
+
+While writing this blog post, I used `orchestrate` in the Copilot App to gather the session history behind the work.
+
+Instead of manually jumping between repositories and trying to reconstruct everything from memory, I spawned two research sessions: one in `snnr-website` and one in `rrm-website`. Each session looked at the relevant migration PR, follow-up PR, commits, validation notes, and local Copilot App session history, then reported back with a concise summary.
+
+That helped me add the details above: the Snnr agent update, the rubber-duck review feedback, the RRM custom-domain fix, the filename-based blog slug cleanup, and the follow-up rewrite sessions. In other words, I used the same session-based workflow to write the story about the session-based workflow.
+
 ### What I Learned
 
 The biggest lesson is that Copilot App is most useful when I give it a clear destination, not just a vague command.
