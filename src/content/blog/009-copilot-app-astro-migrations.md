@@ -26,6 +26,8 @@ For the RRM site, the session was **Astro markdown setup**. It worked on the bra
 
 That separation mattered. Each session had one clear goal, one repository context, and one PR as the final handoff. I could review the output as normal GitHub changes instead of trying to mentally track a long-running chat with mixed edits.
 
+It also made the work feel more like a small product workflow than a single code-generation step. The first pass created the migration, then follow-up turns and smaller sessions handled review feedback, deployment details, and content polish.
+
 ### What I Asked Copilot App To Do
 
 The important part was not just saying "convert this to Astro." I wanted the resulting sites to be easier to update later, so the prompt needed to describe the architecture I wanted:
@@ -41,6 +43,8 @@ The important part was not just saying "convert this to Astro." I wanted the res
 
 That last point is easy to miss. If you are using AI agents repeatedly in the same repository, documentation and agent instructions matter. After the migration, I wanted future sessions to edit Markdown content collections and Astro components, not recreate the old static `index.html` pattern.
 
+On the Snnr site, that meant updating the local **Snnr Web Builder** agent so it knew about Astro routes, Markdown content collections, shared styles, and the validation expectations. This was not just for the current PR; it was to make the next Copilot App session start from the new architecture.
+
 ### First Migration: Snnr Website
 
 The Snnr website migration was the broader one.
@@ -52,6 +56,8 @@ The result was not just "same site, different framework." The site became more c
 The PR also updated GitHub Pages deployment so it installs dependencies, runs the Astro build, and uploads `dist/`. The custom domain, `snnr.co.nz`, stayed preserved through `public/CNAME`.
 
 That is the kind of migration detail I still want to review carefully myself. AI can do the repetitive work, but deployment and domain settings are areas where I want to make sure nothing subtle breaks.
+
+The review pass also led to practical fixes that were easy to miss in a framework migration: a real `mailto:` target for the contact form, better labels, a favicon, canonical links, no duplicate contact source data, and disabled product actions rendered as non-links instead of `href="#"`.
 
 ### Second Migration: RRM Website
 
@@ -70,6 +76,10 @@ Because I had just done the Snnr migration, this second session felt like applyi
 
 This is where Copilot App works well for me. Once the intended pattern is clear, I can run a focused session in another repo and then review the PR rather than doing all the mechanical conversion by hand.
 
+The RRM migration also had a concrete deployment lesson. GitHub Pages sites can behave differently when they are deployed under a project path versus a root custom domain. The session corrected that by removing the project base path, setting the Astro site URL to `https://rrm.co.nz`, and adding `public/CNAME` so the generated artifact preserved the domain.
+
+Another small review improvement was removing manual blog slug frontmatter and letting Astro derive post URLs from content entry IDs and filenames. That made authoring future Markdown posts simpler and reduced one more thing to keep in sync.
+
 ### Pull Requests as the Handoff
 
 I like that the output of these sessions became normal pull requests.
@@ -86,6 +96,8 @@ That gave me a familiar review point:
 
 I also used **rubber-duck review** as part of this step. After Copilot App produced the PR, I used a separate review pass to challenge the changes: does the structure make sense, did the migration preserve the important behavior, and are there any hidden deployment or maintainability problems?
 
+That rubber-duck pass was useful because it was not only checking whether the site built. It pushed on production details: `CNAME` output, GitHub Pages configuration, content duplication, fake links, form behavior, and whether the Markdown authoring model was clean enough to keep using.
+
 The Copilot App session does the implementation work, but the PR and review pass are where I switch back into engineer mode. I still want to understand what changed, why it changed, and whether the result is maintainable.
 
 ### Follow-Up Sessions for Polish
@@ -93,6 +105,8 @@ The Copilot App session does the implementation work, but the PR and review pass
 After the migration PRs, I also used smaller follow-up sessions for content polish.
 
 For Snnr, I had an **Astro blog rewrite** session. For RRM, I had a **Rewrite blog post** session. These were intentionally smaller than the migration sessions. They were not about changing the architecture again; they were about improving the content after the foundation was in place.
+
+In both repos, the first Markdown post became part of the migration story. Instead of leaving generic starter content behind, the follow-up sessions rewrote the first posts to explain why each site moved from static HTML to Astro and Markdown-backed content.
 
 That is another workflow lesson for me: do not overload one AI session with every possible follow-up. Let the migration session migrate. Then use a smaller session for polish once the structure exists.
 
@@ -103,6 +117,8 @@ The biggest lesson is that Copilot App is most useful when I give it a clear des
 "Convert this static site to Astro" might get the job started, but "convert this static site to an Astro static site with Markdown content collections, a blog, GitHub Pages deployment, preserved custom domain, and updated repo instructions" gives the session a much better target.
 
 I also learned that the session boundary matters. One repo, one goal, one branch, one PR. That kept the work easy to review and easy to merge.
+
+The sequence mattered too: build the foundation, review it, fix the deployment and authoring details, merge it, then use a smaller session to improve the content. That is a more reliable pattern than trying to make one huge prompt solve architecture, deployment, review feedback, and editorial polish all at once.
 
 The final result is that both sites are still static and simple to host, but they are no longer awkward to update. Future content can be written in Markdown, shared layout belongs in Astro components, and deployment still goes through GitHub Pages.
 
