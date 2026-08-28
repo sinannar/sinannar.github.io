@@ -12,7 +12,7 @@ export async function GET(context) {
 		site: context.site,
 		items: posts.map((post) => ({
 			title: post.data.title,
-			description: post.data.description || 'Read this post on Sinan Nar.',
+			description: post.data.description || `Read this post on ${SITE_TITLE}.`,
 			pubDate: post.data.pubDate,
 			link: `/blog/${post.id}/`,
 		})),
