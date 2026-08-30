@@ -50,6 +50,10 @@ import { SITE_TITLE } from '../consts';
 			<svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 			</svg>
+			<svg class="icon-matrix" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<path d="M5 3v18M12 3v18M19 3v18"></path>
+				<path d="M3 7h4M10 12h4M17 17h4"></path>
+			</svg>
 		</button>
 	</div>
 </header>
@@ -60,15 +64,23 @@ import { SITE_TITLE } from '../consts';
 		var toggle = document.getElementById('themeToggle');
 		var nav = document.getElementById('primaryNav');
 		var navToggle = document.getElementById('navToggle');
+		var themes = ['dark', 'light', 'matrix'];
 
 		function setTheme(t) {
 			root.setAttribute('data-theme', t);
 			try { localStorage.setItem('theme', t); } catch (_) {}
+			if (toggle) {
+				var next = themes[(themes.indexOf(t) + 1) % themes.length];
+				toggle.setAttribute('aria-label', 'Switch to ' + next + ' theme');
+				toggle.setAttribute('title', 'Switch to ' + next + ' theme');
+			}
 		}
 		if (toggle) {
+			var initialTheme = root.getAttribute('data-theme');
+			setTheme(themes.indexOf(initialTheme) === -1 ? 'dark' : initialTheme);
 			toggle.addEventListener('click', function () {
-				var current = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-				setTheme(current);
+				var current = root.getAttribute('data-theme');
+				setTheme(themes[(themes.indexOf(current) + 1) % themes.length]);
 			});
 		}
 		if (navToggle && nav) {
@@ -135,8 +147,11 @@ import { SITE_TITLE } from '../consts';
 	.theme-toggle:hover { color: var(--text); border-color: var(--accent); }
 	.theme-toggle .icon-sun { display: none; }
 	.theme-toggle .icon-moon { display: block; }
+	.theme-toggle .icon-matrix { display: none; }
 	:root[data-theme='light'] .theme-toggle .icon-sun { display: block; }
 	:root[data-theme='light'] .theme-toggle .icon-moon { display: none; }
+	:root[data-theme='matrix'] .theme-toggle .icon-moon { display: none; }
+	:root[data-theme='matrix'] .theme-toggle .icon-matrix { display: block; }
 
 	.nav-toggle {
 		display: none;
