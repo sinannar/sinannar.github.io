@@ -1,6 +1,6 @@
 /*
   Global styles — terminal / TUI aesthetic.
-  Dark "terminal" theme is the default; light "paper" theme via [data-theme="light"].
+  Dark "terminal" theme is the default, with light "paper" and Matrix variants.
 */
 
 :root,
@@ -67,6 +67,32 @@
 	--shadow-2: 0 2px 0 rgba(15, 23, 42, 0.05), 0 18px 36px rgba(15, 23, 42, 0.12);
 	--glow: 0 0 0 1px rgba(9, 105, 218, 0.22), 0 0 24px rgba(9, 105, 218, 0.15);
 	--ring: 0 0 0 2px rgba(26, 127, 55, 0.45);
+}
+
+:root[data-theme='matrix'] {
+	color-scheme: dark;
+	--bg: #000;
+	--bg-elev: #020802;
+	--surface: #061006;
+	--surface-2: #0a1a0a;
+	--border: #167c28;
+	--border-strong: #21b43a;
+	--text: #c8ffc8;
+	--text-muted: #77c97c;
+	--text-faint: #438f4d;
+	--prompt: #00ff41;
+	--accent: #39ff6a;
+	--accent-soft: rgba(0, 255, 65, 0.16);
+	--magenta: #7dff9a;
+	--yellow: #d5ff40;
+	--orange: #ffb86c;
+	--mvp: #64ff64;
+	--mvp-soft: rgba(100, 255, 100, 0.16);
+	--selection: rgba(0, 255, 65, 0.32);
+	--shadow-1: 0 1px 0 rgba(57, 255, 106, 0.08), 0 8px 24px rgba(0, 0, 0, 0.75);
+	--shadow-2: 0 1px 0 rgba(57, 255, 106, 0.12), 0 16px 48px rgba(0, 0, 0, 0.85);
+	--glow: 0 0 0 1px rgba(0, 255, 65, 0.3), 0 0 24px rgba(0, 255, 65, 0.22);
+	--ring: 0 0 0 2px rgba(0, 255, 65, 0.6);
 }
 
 /* No-FOUC: respected via inline script in BaseHead */
@@ -197,12 +223,23 @@ pre.astro-code {
 
 /* Show the right Shiki theme per mode */
 :root[data-theme='dark'] .astro-code,
-:root[data-theme='dark'] .astro-code span {
+:root[data-theme='dark'] .astro-code span,
+:root[data-theme='matrix'] .astro-code,
+:root[data-theme='matrix'] .astro-code span {
 	color: var(--shiki-dark, inherit) !important;
 	background-color: var(--shiki-dark-bg, var(--surface)) !important;
 	font-style: var(--shiki-dark-font-style, inherit) !important;
 	font-weight: var(--shiki-dark-font-weight, inherit) !important;
 	text-decoration: var(--shiki-dark-text-decoration, inherit) !important;
+}
+
+:root[data-theme='matrix'] body {
+	background:
+		linear-gradient(rgba(0, 255, 65, 0.035) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(0, 255, 65, 0.035) 1px, transparent 1px),
+		radial-gradient(1200px 600px at 50% -200px, var(--accent-soft), transparent 60%),
+		var(--bg);
+	background-size: 24px 24px, 24px 24px, auto;
 }
 
 blockquote {
