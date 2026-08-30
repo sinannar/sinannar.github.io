@@ -3,75 +3,12 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE } from '../consts';
+import { getCollection } from 'astro:content';
 
-interface Contribution {
-	title: string;
-	type: 'pull request' | 'issue' | 'omarchy plugins';
-	repo: string;
-	href: string;
-	status: 'merged' | 'open' | 'published';
-	description: string;
-	date: string;
-	tags: string[];
-}
-
-const contributions: Contribution[] = [
-	{
-		title: 'feat: add Turkish semantic policy signals',
-		type: 'pull request',
-		repo: 'microsoft/agent-governance-toolkit',
-		href: 'https://github.com/microsoft/agent-governance-toolkit/pull/3340',
-		status: 'merged',
-		description:
-			'Added Turkish natural-language risk signals for bulk data deletion, external data transfer, privileged-access grants, system actions, and code execution to the semantic policy classifier.',
-		date: 'Aug 2026',
-		tags: ['python', 'security', 'i18n'],
-	},
-	{
-		title: 'docs: add repository policy authoring skill',
-		type: 'pull request',
-		repo: 'microsoft/agent-governance-toolkit',
-		href: 'https://github.com/microsoft/agent-governance-toolkit/pull/3341',
-		status: 'merged',
-		description:
-			'Added a portable repository policy-authoring skill mapping repository capabilities to minimal policy deltas while maintaining strict governance baselines.',
-		date: 'Jul 2026',
-		tags: ['documentation', 'skills', 'copilot-cli'],
-	},
-	{
-		title: '[Feature]: agent-governance for vscode agentic development',
-		type: 'issue',
-		repo: 'microsoft/agent-governance-toolkit',
-		href: 'https://github.com/microsoft/agent-governance-toolkit/issues/3346',
-		status: 'open',
-		description:
-			'Proposed a VS Code extension wrapping Agent Governance Toolkit features for Copilot CLI and other agentic development harnesses.',
-		date: 'Jul 2026',
-		tags: ['vscode', 'copilot', 'extension'],
-	},
-	{
-		title: 'omarchy.aspire (.NET Aspire Integration)',
-		type: 'omarchy plugins',
-		repo: 'omarchy-os / omarchyplugins.com',
-		href: 'https://omarchyplugins.com/index.html?author=sinannar#catalog',
-		status: 'published',
-		description:
-			'Desktop integration plugin for .NET Aspire dashboard management, process lifecycle control, and augmented environment execution on Omarchy OS.',
-		date: '2026',
-		tags: ['.net aspire', 'qml', 'quickshell'],
-	},
-	{
-		title: 'Omarchy Desktop Plugins',
-		type: 'omarchy plugins',
-		repo: 'omarchy-os / omarchyplugins.com',
-		href: 'https://omarchyplugins.com/index.html?author=sinannar#catalog',
-		status: 'published',
-		description:
-			'Open source plugins developed for the Omarchy operating system, published and searchable on the official plugin catalog.',
-		date: '2026',
-		tags: ['omarchy os', 'linux', 'desktop'],
-	},
-];
+const rawContributions = await getCollection('opensource');
+const contributions = rawContributions
+	.map((item) => item.data)
+	.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
 const counts = {
 	all: contributions.length,
