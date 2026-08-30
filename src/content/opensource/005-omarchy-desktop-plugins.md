@@ -1,8 +1,8 @@
 ---
-title: 'Omarchy Desktop Plugins'
+title: 'Omarchy MSFT Dev Blogs'
 type: 'omarchy plugins'
 repo: 'omarchy-os / omarchyplugins.com'
-href: 'https://omarchyplugins.com/index.html?author=sinannar#catalog'
+href: 'https://omarchyplugins.com/plugin.html?id=sinannar.omarchy.plugin.msftdevblogs'
 status: 'published'
 description: 'Open source plugins developed for the Omarchy operating system, published and searchable on the official plugin catalog.'
 date: '2026'
