@@ -85,7 +85,7 @@
 	--accent-soft: rgba(0, 255, 65, 0.16);
 	--magenta: #7dff9a;
 	--yellow: #d5ff40;
-	--orange: #8cff5d;
+	--orange: #ffb86c;
 	--mvp: #64ff64;
 	--mvp-soft: rgba(100, 255, 100, 0.16);
 	--selection: rgba(0, 255, 65, 0.32);
@@ -234,10 +234,11 @@ pre.astro-code {
 }
 
 :root[data-theme='matrix'] body {
-	background-image:
+	background:
 		linear-gradient(rgba(0, 255, 65, 0.035) 1px, transparent 1px),
 		linear-gradient(90deg, rgba(0, 255, 65, 0.035) 1px, transparent 1px),
-		radial-gradient(1200px 600px at 50% -200px, var(--accent-soft), transparent 60%);
+		radial-gradient(1200px 600px at 50% -200px, var(--accent-soft), transparent 60%),
+		var(--bg);
 	background-size: 24px 24px, 24px 24px, auto;
 }
 
