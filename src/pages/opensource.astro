@@ -1,0 +1,382 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { getCollection } from 'astro:content';
+
+const rawContributions = await getCollection('opensource');
+const contributions = rawContributions
+	.map((item) => item.data)
+	.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+const counts = {
+	all: contributions.length,
+	'pull request': contributions.filter((c) => c.type === 'pull request').length,
+	issue: contributions.filter((c) => c.type === 'issue').length,
+	'omarchy plugins': contributions.filter((c) => c.type === 'omarchy plugins').length,
+};
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`OpenSource | ${SITE_TITLE}`}
+			description="Open source contributions by Sinan Nar — pull requests, issues, and Omarchy OS plugins."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="section page-section">
+				<p class="eyebrow">~/opensource $ ls -1 --tags</p>
+				<h1>OpenSource</h1>
+				<p class="muted">
+					Open source contributions including merged pull requests, project issues, and desktop plugins.
+				</p>
+
+				<!-- Structured Tags Filter Bar -->
+				<div class="filter-bar" role="group" aria-label="Filter contributions by structured tag">
+					<button class="filter-btn active" data-filter="all" aria-pressed="true">
+						all <span class="badge">{counts.all}</span>
+					</button>
+					<button class="filter-btn" data-filter="pull request" aria-pressed="false">
+						pull request <span class="badge">{counts['pull request']}</span>
+					</button>
+					<button class="filter-btn" data-filter="issue" aria-pressed="false">
+						issue <span class="badge">{counts.issue}</span>
+					</button>
+					<button class="filter-btn" data-filter="omarchy plugins" aria-pressed="false">
+						omarchy plugins <span class="badge">{counts['omarchy plugins']}</span>
+					</button>
+				</div>
+
+				<ul class="contrib-list">
+					{
+						contributions.map((item) => (
+							<li class="contrib-card" data-type={item.type}>
+								<article>
+									<header class="card-head">
+										<div class="card-badges">
+											<span class={`type-tag type-${item.type.replace(/\s+/g, '-')}`}>
+												{item.type}
+											</span>
+											<span class={`status-pill status-${item.status}`}>
+												{item.status}
+											</span>
+										</div>
+										<span class="card-date mono">{item.date}</span>
+									</header>
+
+									<h2 class="card-title">
+										<a href={item.href} target="_blank" rel="noopener noreferrer">
+											{item.title}
+										</a>
+									</h2>
+
+									<p class="card-repo mono">
+										<span class="muted">repo: </span>
+										{item.repo}
+									</p>
+
+									<p class="card-desc">{item.description}</p>
+
+									<footer class="card-foot">
+										<ul class="tag-list" aria-label="Tags">
+											{item.tags.map((t) => (
+												<li class="tag">{t}</li>
+											))}
+										</ul>
+										<a
+											class="card-link mono"
+											href={item.href}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											view contribution →
+										</a>
+									</footer>
+								</article>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			(function () {
+				var buttons = document.querySelectorAll('.filter-btn');
+				var cards = document.querySelectorAll('.contrib-card');
+
+				buttons.forEach(function (btn) {
+					btn.addEventListener('click', function () {
+						var filter = btn.getAttribute('data-filter');
+
+						buttons.forEach(function (b) {
+							b.classList.remove('active');
+							b.setAttribute('aria-pressed', 'false');
+						});
+						btn.classList.add('active');
+						btn.setAttribute('aria-pressed', 'true');
+
+						cards.forEach(function (card) {
+							var type = card.getAttribute('data-type');
+							if (filter === 'all' || type === filter) {
+								card.style.display = '';
+							} else {
+								card.style.display = 'none';
+							}
+						});
+					});
+				});
+			})();
+		</script>
+	</body>
+</html>
+
+<style>
+	.page-section {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+
+	.filter-bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 1.5rem 0 2rem;
+		padding: 0.4rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+	}
+
+	.filter-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.4rem 0.8rem;
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: color 120ms ease, background 120ms ease, border-color 120ms ease;
+	}
+
+	.filter-btn:hover {
+		color: var(--text);
+		background: var(--surface-2);
+	}
+
+	.filter-btn.active {
+		color: var(--text);
+		background: var(--surface-2);
+		border-color: var(--accent);
+		font-weight: 600;
+	}
+
+	.filter-btn .badge {
+		display: inline-grid;
+		place-items: center;
+		padding: 0.1em 0.45em;
+		font-size: 0.75rem;
+		border-radius: 999px;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+	}
+
+	.filter-btn.active .badge {
+		background: var(--accent-soft);
+		border-color: var(--accent);
+		color: var(--accent);
+	}
+
+	.contrib-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.contrib-card {
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-lg);
+		padding: 1.25rem 1.4rem;
+		box-shadow: var(--shadow-1);
+		transition: border-color 120ms ease, transform 120ms ease;
+	}
+
+	.contrib-card:hover {
+		border-color: var(--accent);
+		transform: translateY(-1px);
+	}
+
+	.card-head {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	.card-badges {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.type-tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.2rem 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		font-weight: 600;
+		border-radius: 999px;
+		border: 1px solid var(--border);
+		text-transform: lowercase;
+	}
+
+	.type-pull-request {
+		color: var(--magenta);
+		background: color-mix(in srgb, var(--magenta) 15%, transparent);
+		border-color: var(--magenta);
+	}
+
+	.type-issue {
+		color: var(--orange);
+		background: color-mix(in srgb, var(--orange) 15%, transparent);
+		border-color: var(--orange);
+	}
+
+	.type-omarchy-plugins {
+		color: var(--prompt);
+		background: color-mix(in srgb, var(--prompt) 15%, transparent);
+		border-color: var(--prompt);
+	}
+
+	.status-pill {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.15rem 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.75rem;
+		border-radius: var(--radius-sm);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+
+	.status-merged {
+		color: var(--prompt);
+		background: var(--surface-2);
+		border: 1px solid var(--prompt);
+	}
+
+	.status-open {
+		color: var(--yellow);
+		background: var(--surface-2);
+		border: 1px solid var(--yellow);
+	}
+
+	.status-published {
+		color: var(--accent);
+		background: var(--surface-2);
+		border: 1px solid var(--accent);
+	}
+
+	.card-date {
+		color: var(--text-muted);
+		font-size: 0.85rem;
+	}
+
+	.card-title {
+		margin: 0 0 0.4rem;
+		font-size: 1.2rem;
+		line-height: 1.35;
+	}
+
+	.card-title a {
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.card-title a:hover {
+		color: var(--accent);
+		text-decoration: underline;
+	}
+
+	.card-repo {
+		margin: 0 0 0.75rem;
+		font-size: 0.85rem;
+		color: var(--accent);
+	}
+
+	.card-desc {
+		margin: 0 0 1rem;
+		color: var(--text);
+		font-size: 0.95rem;
+		line-height: 1.55;
+	}
+
+	.card-foot {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+		padding-top: 0.75rem;
+		border-top: 1px dashed var(--border);
+	}
+
+	.tag-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		padding: 0.15rem 0.5rem;
+		font-family: var(--font-mono);
+		font-size: 0.78rem;
+		color: var(--text-muted);
+		background: var(--surface-2);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+	}
+
+	.card-link {
+		font-size: 0.85rem;
+		color: var(--accent);
+		white-space: nowrap;
+	}
+
+	@media (max-width: 600px) {
+		.card-head {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.4rem;
+		}
+
+		.card-foot {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+</style>
