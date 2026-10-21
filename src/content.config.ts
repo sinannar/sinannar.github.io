@@ -31,4 +31,15 @@ const opensource = defineCollection({
 	}),
 });
 
-export const collections = { blog, opensource };
+const workshops = defineCollection({
+	loader: glob({ base: './src/content/workshops', pattern: '**/*.{md,mdx}' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		event: z.string(),
+		year: z.number().int(),
+		tags: z.array(z.string()).default([]),
+	}),
+});
+
+export const collections = { blog, opensource, workshops };

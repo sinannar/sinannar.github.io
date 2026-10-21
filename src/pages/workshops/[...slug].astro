@@ -1,0 +1,41 @@
+---
+import { type CollectionEntry, getCollection, render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+
+export async function getStaticPaths() {
+	const workshops = await getCollection('workshops');
+	return workshops.map((workshop) => ({
+		params: { slug: workshop.id },
+		props: { workshop },
+	}));
+}
+
+type Props = { workshop: CollectionEntry<'workshops'> };
+const { workshop } = Astro.props;
+const { Content } = await render(workshop);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`${workshop.data.title} | Workshops | ${SITE_TITLE}`} description={workshop.data.description} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<article class="prose section">
+				<p><a class="mono" href="/workshops/">← all workshops</a></p>
+				<header>
+					<p class="eyebrow">{workshop.data.event} <span class="chip">{workshop.data.year}</span></p>
+					<h1>{workshop.data.title}</h1>
+					<p class="muted">{workshop.data.description}</p>
+				</header>
+				<Content />
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
