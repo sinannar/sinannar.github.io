@@ -1,0 +1,76 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { getCollection } from 'astro:content';
+
+const workshops = (await getCollection('workshops'))
+	.sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title));
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={`Workshops | ${SITE_TITLE}`}
+			description="Hands-on workshops by Sinan Nar, with guides, starter templates, and completed examples."
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="section">
+				<p class="eyebrow">~/workshops $ ls -1</p>
+				<h1>Workshops</h1>
+				<p class="muted">Hands-on sessions with guides, starter templates, and completed examples to learn from and reuse.</p>
+				<ul class="workshops">
+					{workshops.map((workshop) => (
+						<li>
+							<article class="terminal workshop-card">
+								<div class="terminal-bar">
+									<span>{workshop.data.event}</span>
+									<span class="chip" aria-label={`Year ${workshop.data.year}`}>{workshop.data.year}</span>
+								</div>
+								<div class="terminal-body">
+									<h2><a href={`/workshops/${workshop.id}/`}>{workshop.data.title}</a></h2>
+									<p class="muted">{workshop.data.description}</p>
+									<ul class="tags" aria-label="Topics">
+										{workshop.data.tags.map((tag) => <li class="chip">{tag}</li>)}
+									</ul>
+									<a class="mono" href={`/workshops/${workshop.id}/`}>view workshop →</a>
+								</div>
+							</article>
+						</li>
+					))}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.workshops {
+		list-style: none;
+		padding: 0;
+		margin: 2rem 0 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1.25rem;
+	}
+	.workshops > li { margin: 0; min-width: 0; }
+	.workshop-card { height: 100%; }
+	.terminal-bar { justify-content: space-between; flex-wrap: wrap; }
+	h2 { font-size: 1.3rem; }
+	.tags {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	@media (max-width: 720px) {
+		.workshops { grid-template-columns: 1fr; }
+	}
+</style>
