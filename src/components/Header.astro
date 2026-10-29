@@ -8,8 +8,6 @@ import { SITE_TITLE } from '../consts';
 	<div class="bar">
 		<a class="brand" href="/" aria-label={`${SITE_TITLE} — Home`}>
 			<span class="brand-prompt" aria-hidden="true">~/sinannar</span>
-			<span class="brand-sep" aria-hidden="true">$</span>
-			<span class="brand-name">{SITE_TITLE}</span>
 		</a>
 
 		<MvpBadge variant="inline" />
@@ -123,8 +121,6 @@ import { SITE_TITLE } from '../consts';
 	}
 	.brand:hover { text-decoration: none; }
 	.brand-prompt { color: var(--accent); }
-	.brand-sep { color: var(--prompt); }
-	.brand-name { color: var(--text); font-weight: 700; }
 
 	.primary-nav {
 		display: flex;
@@ -208,9 +204,5 @@ import { SITE_TITLE } from '../consts';
 			padding: 0.4rem;
 			margin-top: 0.4rem;
 		}
-	}
-
-	@media (max-width: 480px) {
-		.brand-prompt { display: none; }
 	}
 </style>
